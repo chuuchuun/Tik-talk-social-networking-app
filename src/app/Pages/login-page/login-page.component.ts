@@ -1,19 +1,33 @@
-import { Component } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { Component, inject } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms'; // Import ReactiveFormsModule
+import { AuthService } from '../../auth/auth.service';
+import { from, map } from 'rxjs';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-login-page',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterModule],
   templateUrl: './login-page.component.html',
   styleUrl: './login-page.component.scss'
 })
 export class LoginPageComponent {
-onSubmit() {
+  authService = inject(AuthService)
+  router = inject(Router)
 
-}
   form = new FormGroup({
-    username: new FormControl(null),
-    password: new FormControl(null)
+    username: new FormControl<string | null>(null, Validators.required),
+    password: new FormControl <string | null>(null, Validators.required)
   })
+
+  onSubmit() {
+    if (this.form.valid) {
+      //@ts-ignore
+      this.authService.login(this.form.value).subscribe(res =>{
+      this.router.navigate([''])
+      console.log(res)
+      });
+    }
+  }
+    
 }

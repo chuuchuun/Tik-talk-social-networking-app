@@ -8,9 +8,9 @@ import { Profile } from '../Interfaces/profile.interface';
 })
 export class ProfileService {
   http:HttpClient = inject(HttpClient)
-  baseApiUrl: string = 'https://icherniakov.ru/yt-course/'
+  baseApiUrl: string = 'http://localhost:5178/api'
   getTestAccounts(){
       //return this.http.get<Profile[]>(`${this.baseApiUrl}account/test_accounts`)
-      return this.http.get<Profile[]>(`http://localhost:5178/api/account`)
+      return this.http.get<Profile[]>(`${this.baseApiUrl}/account`)
     }
 }

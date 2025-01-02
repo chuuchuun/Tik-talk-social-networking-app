@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\alla\\Desktop\\backend\\tik-talk\\tik-talk.csproj": {}
+    "C:\\Users\\alla\\Desktop\\tik-talk\\backend\\tik-talk\\tik-talk.csproj": {}
   },
   "projects": {
-    "C:\\Users\\alla\\Desktop\\backend\\tik-talk\\tik-talk.csproj": {
+    "C:\\Users\\alla\\Desktop\\tik-talk\\backend\\tik-talk\\tik-talk.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\alla\\Desktop\\backend\\tik-talk\\tik-talk.csproj",
+        "projectUniqueName": "C:\\Users\\alla\\Desktop\\tik-talk\\backend\\tik-talk\\tik-talk.csproj",
         "projectName": "tik-talk",
-        "projectPath": "C:\\Users\\alla\\Desktop\\backend\\tik-talk\\tik-talk.csproj",
+        "projectPath": "C:\\Users\\alla\\Desktop\\tik-talk\\backend\\tik-talk\\tik-talk.csproj",
         "packagesPath": "C:\\Users\\alla\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\alla\\Desktop\\backend\\tik-talk\\obj\\",
+        "outputPath": "C:\\Users\\alla\\Desktop\\tik-talk\\backend\\tik-talk\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -59,6 +59,10 @@
               "version": "[2.2.0, )"
             },
             "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.AspNetCore.Mvc.NewtonsoftJson": {
               "target": "Package",
               "version": "[8.0.0, )"
             },
