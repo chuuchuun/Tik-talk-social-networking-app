@@ -13,4 +13,5 @@ public interface IAccountRepository
     Task<Account> CreateAsync(Account accountModel);
     Task<Account?> UpdateAsync(int id, Account accountModel);
     Task<Account?> DeleteAsync(int id);
+    Task<Account?> GetByUsernameAsync(string username);
 }

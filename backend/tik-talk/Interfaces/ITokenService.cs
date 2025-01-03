@@ -10,4 +10,5 @@ public interface ITokenService
 {
     string CreateToken(Auth auth);
     string GenerateRefreshToken();
+    string ExtractUsernameFromToken(string token);
 }

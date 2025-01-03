@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using tik_talk.Data;
+using tik_talk.Dtos;
 using tik_talk.Interfaces;
 using tik_talk.Models;
 
@@ -39,12 +40,18 @@ public class AccountRepository : IAccountRepository
         return await _context.Accounts.ToListAsync();
     }
 
-    public Task<Account?> GetByIdAsync(int id)
+    public async Task<Account?> GetByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        return await _context.Accounts.FirstOrDefaultAsync(i => i.Id == id);
+   
     }
+public async Task<Account?> GetByUsernameAsync(string username)
+{
+    return await _context.Accounts
+        .FirstOrDefaultAsync(a => a.username == username);
+}
 
-    public async Task<Account?> UpdateAsync(int id, Account accountModel)
+  public async Task<Account?> UpdateAsync(int id, Account accountModel)
     {
         var account = await _context.Accounts.FirstOrDefaultAsync(a => a.Id == id);
         if(account == null){

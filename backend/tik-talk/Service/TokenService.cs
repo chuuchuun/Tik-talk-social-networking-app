@@ -47,4 +47,15 @@ public class TokenService : ITokenService
     {
         return Guid.NewGuid().ToString(); // Alternatively, use a stronger random token generator
     }
+    public string ExtractUsernameFromToken(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+
+            // Extract username from token's claims
+            var username = jsonToken?.Claims
+                .FirstOrDefault(c => c.Type == "unique_name")?.Value;
+
+            return username;
+        }
 }
