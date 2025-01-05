@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
+using tik_talk.Dtos;
 using tik_talk.Interfaces;
 using tik_talk.Models;
 
@@ -31,7 +33,7 @@ public class TokenService : ITokenService
 
     var tokenDescriptor = new SecurityTokenDescriptor{
         Subject = new ClaimsIdentity(claims),
-        Expires = DateTime.Now.AddDays(7),
+        Expires = DateTime.Now.AddMinutes(2),
         SigningCredentials = creds,
         Issuer = _configuration["JWT:Issuer"],
         Audience = _configuration["JWT:Audience"]
@@ -45,17 +47,19 @@ public class TokenService : ITokenService
 
   public string GenerateRefreshToken()
     {
-        return Guid.NewGuid().ToString(); // Alternatively, use a stronger random token generator
-    }
-    public string ExtractUsernameFromToken(string token)
-        {
-            var handler = new JwtSecurityTokenHandler();
-            var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
-
-            // Extract username from token's claims
-            var username = jsonToken?.Claims
-                .FirstOrDefault(c => c.Type == "unique_name")?.Value;
-
-            return username;
+        var randomNumber = new byte[64];
+        using(var numberGenerator = RandomNumberGenerator.Create()){
+            numberGenerator.GetBytes(randomNumber);
         }
+
+        return Convert.ToBase64String(randomNumber);
+    }
+   public string ExtractUsernameFromToken(string accessToken)
+{
+    var handler = new JwtSecurityTokenHandler();
+    var jsonToken = handler.ReadToken(accessToken) as JwtSecurityToken;
+    var username = jsonToken?.Claims.FirstOrDefault(c => c.Type == "given_name")?.Value;
+    return username;
+}
+
 }

@@ -15,6 +15,8 @@ export class ProfileService {
     }
 
   getMe(){
-    return this.http.get<Profile>(`${this.baseApiUrl}/account/me`)
+    return this.http.get<Profile>(`${this.baseApiUrl}/account/me`, {
+      withCredentials: true
+    })
   }
 }

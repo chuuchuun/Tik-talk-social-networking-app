@@ -12,8 +12,8 @@ using tik_talk.Data;
 namespace tik_talk.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20241231175942_Identity")]
-    partial class Identity
+    [Migration("20250104115312_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,6 +50,20 @@ namespace tik_talk.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "0753a04d-5ed2-4544-81f9-683f1322b824",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "4100c96c-d4ab-4023-8b0d-e5bb1f874191",
+                            Name = "User",
+                            NormalizedName = "USER"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -256,6 +270,12 @@ namespace tik_talk.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("refreshToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("refreshTokenExpiry")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 

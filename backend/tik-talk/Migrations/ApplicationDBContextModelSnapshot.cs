@@ -51,13 +51,13 @@ namespace tik_talk.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "d278e4ac-9db7-4ee2-bc94-b7a297142df8",
+                            Id = "0753a04d-5ed2-4544-81f9-683f1322b824",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "e5bb7863-2672-4f67-ac8a-140de29a52c9",
+                            Id = "4100c96c-d4ab-4023-8b0d-e5bb1f874191",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -267,6 +267,12 @@ namespace tik_talk.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("refreshToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("refreshTokenExpiry")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 

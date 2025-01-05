@@ -49,10 +49,13 @@ builder.Services.AddSwaggerGen(option =>
 // Add CORS policy (allow any origin for development purposes)
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
-        builder => builder.AllowAnyOrigin() // You can specify allowed origins here
-                          .AllowAnyMethod()
-                          .AllowAnyHeader());
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200") // Add the origin of your Angular app
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
 });
 builder.Services.AddDbContext<ApplicationDBContext>(options => {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
@@ -78,6 +81,7 @@ builder.Services.AddAuthentication(options => {
         ValidateAudience = true,
         ValidAudience = builder.Configuration["JWT:Audience"],
         ValidateIssuerSigningKey = true,
+        RequireExpirationTime= true,
         IssuerSigningKey = new SymmetricSecurityKey(
             System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"])
         )
@@ -96,10 +100,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
+app.UseCors("AllowFrontend");
 app.UseHttpsRedirection();
+
+app.MapControllers();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseCors("AllowAll");
-app.MapControllers();
-
 app.Run();

@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { tap } from 'rxjs';
+import { catchError, tap, throwError } from 'rxjs';
 import { TokenResponse } from './auth.interface';
 import { CookieService } from 'ngx-cookie-service';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -13,28 +14,52 @@ export class AuthService {
   http: HttpClient = inject(HttpClient)
   baseApiUrl: string = 'http://localhost:5178/api'
   cookiesService = inject(CookieService)
+  router = inject(Router)
+
   get isAuth(){
-    console.log('Access token:', this.token); // Log the token to verify it's being set
     if(!this.token){
       this.token = this.cookiesService.get('token')
+      this.refreshToken = this.cookiesService.get('refreshToken')
     } 
-      return !!this.token
+    console.log('Access token:', this.token); // Log the token to verify it's being set
+    console.log('Refresh token:', this.refreshToken); // Log the token to verify it's being set
+    return !!this.token
   }
 
   login(payload: { username: string, password: string }) {
     return this.http.post<TokenResponse>('http://localhost:5178/api/auth/login', payload)
       .pipe(
-        tap((response: TokenResponse) => {
-          console.log('Login response:', response); // Check the response here
-          this.token = response.accessToken;
-          this.refreshToken = response.refreshToken;
-
-          this.cookiesService.set('token', this.token)
-          this.cookiesService.set('refreshToken', this.refreshToken)
-        })
+        tap(val => this.saveTokens(val))
       );
   }
   
+  refreshAuthToken(){
+    return this.http.post<TokenResponse>('http://localhost:5178/api/auth/refresh',
+      {
+        accessToken : this.token,
+        refreshToken : this.refreshToken
+      },
+    ).pipe(
+      tap(res=> this.saveTokens(res)),
+      catchError(err => {
+        this.logout()
+        return throwError(() => err)
+      })
+    )
+  }
   
+  logout(){
+    this.cookiesService.deleteAll()
+    this.token = null
+    this.refreshToken = null
+    this.router.navigate(['/login'])
+  }
+saveTokens(response : TokenResponse) {
+    console.log('Login response:', response); // Check the response here
+    this.token = response.accessToken;
+    this.refreshToken = response.refreshToken;
 
+    this.cookiesService.set('token', this.token)
+    this.cookiesService.set('refreshToken', this.refreshToken)
+  }
 }

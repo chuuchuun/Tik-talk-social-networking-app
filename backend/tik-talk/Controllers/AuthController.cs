@@ -71,13 +71,54 @@ public class AuthController:ControllerBase
         if(!result.Succeeded){
             return Unauthorized("Username not found or password is incorrect");
         }
+        var accessToken = _tokenService.CreateToken(user);
+        var refreshToken = _tokenService.GenerateRefreshToken();
 
+        user.refreshToken = refreshToken;
+        user.refreshTokenExpiry = DateTime.Now.AddHours(12);
+        await _userManager.UpdateAsync(user);
         return Ok(
-            new TokenDto{
-                AccessToken = _tokenService.CreateToken(user),
-                RefreshToken = _tokenService.GenerateRefreshToken()
-    });
+            new LoginResponse{
+                accessToken = accessToken,
+                refreshToken = refreshToken,
+                isLoggedIn = true
+            });
 
     }
+  [HttpPost("refresh")]
+public async Task<IActionResult> RefreshToken([FromBody]TokenDto tokens)
+{
+    try
+    {
+        var username = _tokenService.ExtractUsernameFromToken(tokens.accessToken);
+        if (string.IsNullOrEmpty(username))
+        {
+            return Unauthorized("Invalid token: username not found");
+        }
+
+        var identityUser = await _userManager.FindByNameAsync(username);
+        if (identityUser == null || identityUser.refreshToken != tokens.refreshToken || identityUser.refreshTokenExpiry < DateTime.Now)
+        {
+            return Unauthorized("Invalid refresh token or expired token");
+        }
+
+        var response = new LoginResponse
+        {
+            isLoggedIn = true,
+            accessToken = _tokenService.CreateToken(identityUser),
+            refreshToken = _tokenService.GenerateRefreshToken()
+        };
+
+        identityUser.refreshToken = response.refreshToken;
+        identityUser.refreshTokenExpiry = DateTime.Now.AddHours(12);
+        await _userManager.UpdateAsync(identityUser);
+
+        return Ok(response);
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, ex.Message);
+    }
+}
 
 }

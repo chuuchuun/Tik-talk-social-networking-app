@@ -12,6 +12,7 @@ using System.Security.Claims;
 using tik_talk.Dtos;
 using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Cors;
 
 namespace tik_talk.Controllers;
 
@@ -73,6 +74,8 @@ public class AccountController : ControllerBase
     } 
     [Authorize]
     [HttpGet("me")]
+        [EnableCors("AllowFrontend")] 
+
     public async Task<IActionResult> GetMyAccount()
     {
         // Extract the token from the Authorization header
