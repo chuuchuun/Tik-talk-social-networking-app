@@ -27,7 +27,9 @@ namespace tik_talk.Migrations
                     isActive = table.Column<bool>(type: "bit", nullable: false),
                     stack = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     city = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    description = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    subscribers = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    subscriptions = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -186,8 +188,8 @@ namespace tik_talk.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "0753a04d-5ed2-4544-81f9-683f1322b824", null, "Admin", "ADMIN" },
-                    { "4100c96c-d4ab-4023-8b0d-e5bb1f874191", null, "User", "USER" }
+                    { "5d00af91-d374-4cde-8c93-e61430242371", null, "User", "USER" },
+                    { "bfa3c7be-f943-40fd-adb0-fc830c0ca07d", null, "Admin", "ADMIN" }
                 });
 
             migrationBuilder.CreateIndex(

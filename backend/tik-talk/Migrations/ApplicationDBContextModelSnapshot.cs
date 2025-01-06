@@ -51,13 +51,13 @@ namespace tik_talk.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "0753a04d-5ed2-4544-81f9-683f1322b824",
+                            Id = "bfa3c7be-f943-40fd-adb0-fc830c0ca07d",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "4100c96c-d4ab-4023-8b0d-e5bb1f874191",
+                            Id = "5d00af91-d374-4cde-8c93-e61430242371",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -204,8 +204,16 @@ namespace tik_talk.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("subscribers")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("subscribersAmmount")
                         .HasColumnType("int");
+
+                    b.Property<string>("subscriptions")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("username")
                         .IsRequired()

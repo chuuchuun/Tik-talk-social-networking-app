@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using tik_talk.Dtos;
 
 namespace tik_talk.Models;
 
@@ -19,4 +20,6 @@ public class Account
     public List<string> stack {get;set;} = new List<string>();
     public string city{get;set;}
     public string description{get;set;} = string.Empty;
+    public List<string> subscribers{get;set;} = new List<string>();
+    public List<string> subscriptions{get;set;} = new List<string>();
 }

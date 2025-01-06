@@ -14,4 +14,6 @@ public interface IAccountRepository
     Task<Account?> UpdateAsync(int id, Account accountModel);
     Task<Account?> DeleteAsync(int id);
     Task<Account?> GetByUsernameAsync(string username);
+    Task<bool> SubscribeAsync(int id1, int id2);
+    Task<Account> GetAccountFromTokenAsync(string token);
 }

@@ -13,6 +13,7 @@ using tik_talk.Dtos;
 using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Cors;
+using tik_talk.Mappers;
 
 namespace tik_talk.Controllers;
 
@@ -36,8 +37,8 @@ public class AccountController : ControllerBase
             return BadRequest(ModelState);
         }
         var accounts = await _accountRepo.GetAllAsync();
-        //var stockDTO = accounts.Select(s => s.ToStockDto()).ToList();
-        return Ok(accounts);
+        var accountDTO = accounts.Select(s => s.ToAccountDto()).ToList();
+        return Ok(accountDTO);
     }
 
 
@@ -63,6 +64,19 @@ public class AccountController : ControllerBase
         return Ok(account);
     }
 
+      [HttpGet]
+    [Route("{id:int}")]
+    public async Task<IActionResult> GeAccountById([FromRoute] int id){
+        if(!ModelState.IsValid){
+            return BadRequest(ModelState);
+        }
+        var account = await _accountRepo.GetByIdAsync(id);
+        if(account == null){
+            return NotFound();
+        }
+        return Ok(account);
+    }
+
     [HttpDelete]
     [Route("{id:int}")]
     public async Task<IActionResult> Delete([FromRoute] int id){
@@ -78,49 +92,174 @@ public class AccountController : ControllerBase
 
     public async Task<IActionResult> GetMyAccount()
     {
-        // Extract the token from the Authorization header
         var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
-
-        if (string.IsNullOrEmpty(token))
+        try
         {
-            return Unauthorized("Token is missing.");
+            var account = await _accountRepo.GetAccountFromTokenAsync(token);
+            var accountDto = new AccountDto
+                {
+                    Id = account.Id,
+                    Username = account.username,
+                    AvatarUrl = account.avatarUrl,
+                    SubscribersAmount = account.subscribersAmmount,
+                    FirstName = account.firstName,
+                    LastName = account.lastName,
+                    IsActive = account.isActive,
+                    Stack = account.stack,
+                    City = account.city,
+                    Description = account.description
+                };
+            return Ok(accountDto);
         }
-
-        // Decode the token and extract claims
-        var handler = new JwtSecurityTokenHandler();
-        var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
-
-        // Extract the 'given_name' claim
-        var givenName = jsonToken?.Claims.FirstOrDefault(c => c.Type == "given_name")?.Value;
-
-        if (string.IsNullOrEmpty(givenName))
+        catch (UnauthorizedAccessException ex)
         {
-            return Unauthorized("Given name not found in the token.");
+            return Unauthorized(ex.Message);
         }
-
-        // Now you can use the givenName (for example, to fetch the account)
-        var account = await _accountRepo.GetByUsernameAsync(givenName);
-
-        if (account == null)
+        catch (Exception ex)
         {
-            return NotFound("Account not found.");
+            return StatusCode(500, ex.Message);
         }
-
-        var accountDto = new AccountDto
-        {
-            Id = account.Id,
-            Username = account.username,
-            AvatarUrl = account.avatarUrl,
-            SubscribersAmount = account.subscribersAmmount,
-            FirstName = account.firstName,
-            LastName = account.lastName,
-            IsActive = account.isActive,
-            Stack = account.stack,
-            City = account.city,
-            Description = account.description
-        };
-
-        return Ok(accountDto);
+     
     }
+    [Authorize]
+[HttpPost("subscribe/{id:int}")]
+public async Task<IActionResult> Subscribe([FromRoute] int id)
+{
+    var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+    var currentAccount = await _accountRepo.GetAccountFromTokenAsync(token);
+    
+    if (currentAccount == null)
+    {
+        return NotFound("Current account not found.");
+    }
+
+    var targetAccount = await _accountRepo.GetByIdAsync(id);
+    if (targetAccount == null)
+    {
+        return NotFound("Target account not found.");
+    }
+
+    var success = await _accountRepo.SubscribeAsync(currentAccount.Id, targetAccount.Id);
+    if (!success)
+    {
+        return BadRequest("Failed to subscribe.");
+    }
+
+    return Ok(new { message = "Successfully subscribed." });
+}
+   [Authorize]
+[HttpGet("subscribers")]
+[EnableCors("AllowFrontend")]
+public async Task<IActionResult> MySubscribers()
+{
+    var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+
+    if (string.IsNullOrEmpty(token))
+    {
+        return Unauthorized("Token is missing.");
+    }
+
+    // Decode the token and extract claims
+    var handler = new JwtSecurityTokenHandler();
+    var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+
+    // Extract the 'given_name' claim
+    var givenName = jsonToken?.Claims.FirstOrDefault(c => c.Type == "given_name")?.Value;
+
+    if (string.IsNullOrEmpty(givenName))
+    {
+        return Unauthorized("Given name not found in the token.");
+    }
+
+    // Fetch the account
+    var account = await _accountRepo.GetByUsernameAsync(givenName);
+
+    if (account == null)
+    {
+        return NotFound("Account not found.");
+    }
+
+    // Fetch the subscribers (AccountDto list)
+    var subscribers = new List<AccountDto>();
+    foreach (var subscriberUsername in account.subscribers)
+    {
+        var subscriberAccount = await _accountRepo.GetByUsernameAsync(subscriberUsername);
+        if (subscriberAccount != null)
+        {
+            subscribers.Add(new AccountDto
+            {
+                Id = subscriberAccount.Id,
+                Username = subscriberAccount.username,
+                AvatarUrl = subscriberAccount.avatarUrl,
+                SubscribersAmount = subscriberAccount.subscribersAmmount,
+                FirstName = subscriberAccount.firstName,
+                LastName = subscriberAccount.lastName,
+                IsActive = subscriberAccount.isActive,
+                Stack = subscriberAccount.stack,
+                City = subscriberAccount.city,
+                Description = subscriberAccount.description
+            });
+        }
+    }
+
+    return Ok(subscribers);
 }
 
+[Authorize]
+[HttpGet("subscriptions")]
+[EnableCors("AllowFrontend")]
+public async Task<IActionResult> MySubscriptions()
+{
+    var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+
+    if (string.IsNullOrEmpty(token))
+    {
+        return Unauthorized("Token is missing.");
+    }
+
+    // Decode the token and extract claims
+    var handler = new JwtSecurityTokenHandler();
+    var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+
+    // Extract the 'given_name' claim
+    var givenName = jsonToken?.Claims.FirstOrDefault(c => c.Type == "given_name")?.Value;
+
+    if (string.IsNullOrEmpty(givenName))
+    {
+        return Unauthorized("Given name not found in the token.");
+    }
+
+    // Fetch the account
+    var account = await _accountRepo.GetByUsernameAsync(givenName);
+
+    if (account == null)
+    {
+        return NotFound("Account not found.");
+    }
+
+    // Fetch the subscriptions (AccountDto list)
+    var subscriptions = new List<AccountDto>();
+    foreach (var subscriptionUsername in account.subscriptions)
+    {
+        var subscriptionAccount = await _accountRepo.GetByUsernameAsync(subscriptionUsername);
+        if (subscriptionAccount != null)
+        {
+            subscriptions.Add(new AccountDto
+            {
+                Id = subscriptionAccount.Id,
+                Username = subscriptionAccount.username,
+                AvatarUrl = subscriptionAccount.avatarUrl,
+                SubscribersAmount = subscriptionAccount.subscribersAmmount,
+                FirstName = subscriptionAccount.firstName,
+                LastName = subscriptionAccount.lastName,
+                IsActive = subscriptionAccount.isActive,
+                Stack = subscriptionAccount.stack,
+                City = subscriptionAccount.city,
+                Description = subscriptionAccount.description
+            });
+        }
+    }
+
+    return Ok(subscriptions);
+}
+}
