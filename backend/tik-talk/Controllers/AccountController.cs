@@ -43,12 +43,12 @@ public class AccountController : ControllerBase
 
 
     [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Account account){
+        public async Task<IActionResult> Create([FromBody] AccountDto account){
             if(!ModelState.IsValid){
                 return BadRequest(ModelState);
             }
             //var stockModel = stockDto.ToStockFromCreateRequestDto();
-            await _accountRepo.CreateAsync(account);
+            await _accountRepo.CreateAsync(account.ToAccount());
             return Ok(account);
         }
     [HttpPatch]
@@ -121,6 +121,30 @@ public class AccountController : ControllerBase
         }
      
     }
+
+    [Authorize]
+    [HttpDelete("me")]
+        [EnableCors("AllowFrontend")] 
+    public async Task<IActionResult> DeleteMyAccount()
+    {
+        var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+        try
+        {
+            var account = await _accountRepo.GetAccountFromTokenAsync(token);
+            await _accountRepo.DeleteAsync(account.Id);
+
+            return NoContent();
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+     
+    }
     [Authorize]
 [HttpPost("subscribe/{id:int}")]
 public async Task<IActionResult> Subscribe([FromRoute] int id)
@@ -150,116 +174,183 @@ public async Task<IActionResult> Subscribe([FromRoute] int id)
    [Authorize]
 [HttpGet("subscribers")]
 [EnableCors("AllowFrontend")]
-public async Task<IActionResult> MySubscribers()
+public async Task<IActionResult> MySubscribers(
+    [FromQuery] string? stack = null,
+    [FromQuery] string? firstLastName = null,
+    [FromQuery] string? city = null,
+    [FromQuery] string? orderBy = "id",
+    [FromQuery] int page = 1,
+    [FromQuery] int size = 50)
 {
     var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+    var myAccount = await _accountRepo.GetAccountFromTokenAsync(token);
 
-    if (string.IsNullOrEmpty(token))
-    {
-        return Unauthorized("Token is missing.");
-    }
-
-    // Decode the token and extract claims
-    var handler = new JwtSecurityTokenHandler();
-    var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
-
-    // Extract the 'given_name' claim
-    var givenName = jsonToken?.Claims.FirstOrDefault(c => c.Type == "given_name")?.Value;
-
-    if (string.IsNullOrEmpty(givenName))
-    {
-        return Unauthorized("Given name not found in the token.");
-    }
-
-    // Fetch the account
-    var account = await _accountRepo.GetByUsernameAsync(givenName);
-
-    if (account == null)
+    if (myAccount == null)
     {
         return NotFound("Account not found.");
     }
 
-    // Fetch the subscribers (AccountDto list)
-    var subscribers = new List<AccountDto>();
-    foreach (var subscriberUsername in account.subscribers)
+    var subscribersUsernames = myAccount.subscribers;
+
+   var subscriberAccounts = new List<Account>();
+
+foreach (var username in subscribersUsernames)
+{
+    var account = await _accountRepo.GetByUsernameAsync(username);
+    if (account != null)
     {
-        var subscriberAccount = await _accountRepo.GetByUsernameAsync(subscriberUsername);
-        if (subscriberAccount != null)
-        {
-            subscribers.Add(new AccountDto
-            {
-                Id = subscriberAccount.Id,
-                Username = subscriberAccount.username,
-                AvatarUrl = subscriberAccount.avatarUrl,
-                SubscribersAmount = subscriberAccount.subscribersAmmount,
-                FirstName = subscriberAccount.firstName,
-                LastName = subscriberAccount.lastName,
-                IsActive = subscriberAccount.isActive,
-                Stack = subscriberAccount.stack,
-                City = subscriberAccount.city,
-                Description = subscriberAccount.description
-            });
-        }
+        subscriberAccounts.Add(account);
+    }
+}
+
+    var validSubscriberAccounts = subscriberAccounts.Where(account => account != null).ToList();
+    if (!string.IsNullOrEmpty(stack))
+    {
+        validSubscriberAccounts = validSubscriberAccounts
+            .Where(account => account.stack.Contains(stack))
+            .ToList();
     }
 
-    return Ok(subscribers);
+    if (!string.IsNullOrEmpty(firstLastName))
+    {
+        validSubscriberAccounts = validSubscriberAccounts
+            .Where(account => (account.firstName + " " + account.lastName).Contains(firstLastName, StringComparison.OrdinalIgnoreCase) ||
+                              (account.lastName + " " + account.firstName).Contains(firstLastName, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
+    if (!string.IsNullOrEmpty(city))
+    {
+        validSubscriberAccounts = validSubscriberAccounts
+            .Where(account => account.city == city)
+            .ToList();
+    }
+
+    var subscribers = validSubscriberAccounts.Select(account => new AccountDto
+    {
+        Id = account.Id,
+        Username = account.username,
+        AvatarUrl = account.avatarUrl,
+        SubscribersAmount = account.subscribersAmmount,
+        FirstName = account.firstName,
+        LastName = account.lastName,
+        IsActive = account.isActive,
+        Stack = account.stack,
+        City = account.city,
+        Description = account.description
+    }).ToList();
+
+    subscribers = orderBy.ToLower() switch
+    {
+        "username" => subscribers.OrderBy(s => s.Username).ToList(),
+        "subscribersamount" => subscribers.OrderByDescending(s => s.SubscribersAmount).ToList(),
+        "city" => subscribers.OrderBy(s => s.City).ToList(),
+        _ => subscribers.OrderBy(s => s.Id).ToList(),
+    };
+
+    var total = subscribers.Count;
+    var totalPages = (int)Math.Ceiling((double)total / size);
+    var paginatedSubscribers = subscribers
+        .Skip((page - 1) * size)
+        .Take(size)
+        .ToList();
+
+    var response = new
+    {
+        Items = paginatedSubscribers,
+        Total = total,
+        Page = page,
+        Size = size,
+        Pages = totalPages
+    };
+
+    return Ok(response);
 }
 
 [Authorize]
 [HttpGet("subscriptions")]
 [EnableCors("AllowFrontend")]
-public async Task<IActionResult> MySubscriptions()
+public async Task<IActionResult> MySubscriptions( [FromQuery] string? stack = null,
+    [FromQuery] string? firstLastName = null,
+    [FromQuery] string? city = null,
+    [FromQuery] string? orderBy = "id",
+    [FromQuery] int page = 1,
+    [FromQuery] int size = 50)
 {
     var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
-
-    if (string.IsNullOrEmpty(token))
-    {
-        return Unauthorized("Token is missing.");
-    }
-
-    // Decode the token and extract claims
-    var handler = new JwtSecurityTokenHandler();
-    var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
-
-    // Extract the 'given_name' claim
-    var givenName = jsonToken?.Claims.FirstOrDefault(c => c.Type == "given_name")?.Value;
-
-    if (string.IsNullOrEmpty(givenName))
-    {
-        return Unauthorized("Given name not found in the token.");
-    }
-
-    // Fetch the account
-    var account = await _accountRepo.GetByUsernameAsync(givenName);
+    var account = await _accountRepo.GetAccountFromTokenAsync(token);
 
     if (account == null)
     {
         return NotFound("Account not found.");
     }
 
-    // Fetch the subscriptions (AccountDto list)
-    var subscriptions = new List<AccountDto>();
-    foreach (var subscriptionUsername in account.subscriptions)
+    var subscribersUsernames = account.subscriptions;
+
+    var subscriberAccounts = await Task.WhenAll(
+        subscribersUsernames.Select(async username => await _accountRepo.GetByUsernameAsync(username))
+    );
+    var validSubscriberAccounts = subscriberAccounts.Where(account => account != null).ToList();
+    if (!string.IsNullOrEmpty(stack))
     {
-        var subscriptionAccount = await _accountRepo.GetByUsernameAsync(subscriptionUsername);
-        if (subscriptionAccount != null)
-        {
-            subscriptions.Add(new AccountDto
-            {
-                Id = subscriptionAccount.Id,
-                Username = subscriptionAccount.username,
-                AvatarUrl = subscriptionAccount.avatarUrl,
-                SubscribersAmount = subscriptionAccount.subscribersAmmount,
-                FirstName = subscriptionAccount.firstName,
-                LastName = subscriptionAccount.lastName,
-                IsActive = subscriptionAccount.isActive,
-                Stack = subscriptionAccount.stack,
-                City = subscriptionAccount.city,
-                Description = subscriptionAccount.description
-            });
-        }
+        validSubscriberAccounts = validSubscriberAccounts
+            .Where(account => account.stack.Contains(stack))
+            .ToList();
     }
 
-    return Ok(subscriptions);
+    if (!string.IsNullOrEmpty(firstLastName))
+    {
+        validSubscriberAccounts = validSubscriberAccounts
+            .Where(account => (account.firstName + " " + account.lastName).Contains(firstLastName, StringComparison.OrdinalIgnoreCase) ||
+                              (account.lastName + " " + account.firstName).Contains(firstLastName, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
+    if (!string.IsNullOrEmpty(city))
+    {
+        validSubscriberAccounts = validSubscriberAccounts
+            .Where(account => account.city == city)
+            .ToList();
+    }
+
+    var subscribers = validSubscriberAccounts.Select(account => new AccountDto
+    {
+        Id = account.Id,
+        Username = account.username,
+        AvatarUrl = account.avatarUrl,
+        SubscribersAmount = account.subscribersAmmount,
+        FirstName = account.firstName,
+        LastName = account.lastName,
+        IsActive = account.isActive,
+        Stack = account.stack,
+        City = account.city,
+        Description = account.description
+    }).ToList();
+
+    subscribers = orderBy.ToLower() switch
+    {
+        "username" => subscribers.OrderBy(s => s.Username).ToList(),
+        "subscribersamount" => subscribers.OrderByDescending(s => s.SubscribersAmount).ToList(),
+        "city" => subscribers.OrderBy(s => s.City).ToList(),
+        _ => subscribers.OrderBy(s => s.Id).ToList(),
+    };
+
+    var total = subscribers.Count;
+    var totalPages = (int)Math.Ceiling((double)total / size);
+    var paginatedSubscribers = subscribers
+        .Skip((page - 1) * size)
+        .Take(size)
+        .ToList();
+
+    var response = new
+    {
+        Items = paginatedSubscribers,
+        Total = total,
+        Page = page,
+        Size = size,
+        Pages = totalPages
+    };
+
+    return Ok(response);
 }
 }

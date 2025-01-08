@@ -1,0 +1,16 @@
+@if (profile(); as profile) {
+    @if (profile.avatarUrl) {
+        <img [src]="profile.avatarUrl" alt="avatar" class="main-profile-image">
+    }
+    @else {
+        <img src="/assets/images/profile-placeholder">
+    }
+    <div class="name-and-username">
+        <div class="h4">
+            {{profile.firstName}} {{profile.lastName}}
+        </div>
+        <div class="regular-text">
+            {{profile.username}}
+        </div>
+    </div>
+}

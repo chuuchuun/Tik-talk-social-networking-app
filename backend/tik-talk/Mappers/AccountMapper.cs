@@ -23,5 +23,17 @@ public static class AccountMapper
                 IsActive =account.isActive
                 };
         }
-
+        public static Account ToAccount(this AccountDto accountDto){
+                return new Account{
+                username = accountDto.Username,
+                avatarUrl = accountDto.AvatarUrl,
+                firstName = accountDto.FirstName,
+                lastName = accountDto.LastName,
+                stack = accountDto.Stack,
+                subscribersAmmount = accountDto.SubscribersAmount,
+                city = accountDto.City,
+                description = accountDto.Description,
+                isActive =accountDto.IsActive
+                };
+        }
 }

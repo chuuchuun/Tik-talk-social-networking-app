@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace tik_talk.Dtos;
 
-public class AccountDto
+public class NewAccountDto
 {
-    public int Id { get; set; }
+    
     public string Username { get; set; }
     public string AvatarUrl { get; set; }
     public int SubscribersAmount { get; set; }
@@ -19,4 +18,3 @@ public class AccountDto
     public string City { get; set; }
     public string Description { get; set; }
 }
-

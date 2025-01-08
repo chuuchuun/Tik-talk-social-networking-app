@@ -1,9 +1,8 @@
 :host{
     display: block;
     padding: 20px 12px;
-    background: none;
-    background-color: var(--dark-color);
-    height:900px ;
+    background: var(--dark-color);
+    position: relative;
 }
 
 .main-menu-list{
@@ -40,3 +39,63 @@
     width: 16px;
     height: 16px;
 }
+.to-subscribers{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+
+}
+
+.to-subscribers-link{
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.sidebar-footer{
+    position: absolute;
+    width: calc(100% - 20px);
+    bottom: 20px;
+    background: var(--dark-color);
+    color: var(--light-color);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 24px;
+    font-family: 'JetBrains Mono';
+    border-radius: 2px;
+    padding: 4px 16px;
+    display: grid;
+    grid-gap: 10px;
+    align-items: center;
+    grid-template-columns: 32px 1fr 13px max-content;
+    &:hover,
+    &:focus-visible{
+        background: var(--hover-color);
+        color: var(--primary-color);
+    }
+
+
+}
+
+.my-avatar{
+    width: 32px;
+    height: 32px;
+    border-radius: 50% ;
+    overflow: hidden;
+}
+
+.settings-button{
+    text-decoration: none;
+    color: var(--light-color);
+    svg{
+        width: 13px;
+        height: 13px;
+        margin-top: 9px;
+    }
+}
+
+
+.sidebar-footer:hover .settings-button {
+    color: var(--primary-color);
+}
+
+

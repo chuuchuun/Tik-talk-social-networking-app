@@ -1,0 +1,18 @@
+:host{
+    display: grid;
+    grid-template-columns: 112px 1fr;
+    grid-gap: 24px;
+}
+
+.main-profile-image{
+    width: 112px;
+    height: 112px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.name-and-username{
+    display: grid;
+    grid-template-rows: 32px 1fr;
+    grid-gap: 4px;
+}

@@ -16,12 +16,12 @@
     padding: 0;
 }
 body{
+    height: 100dvh;
     background-color: var(--dark-color);
     color: var(--light-color);
     font-family: 'JetBrains Mono';
     background-image: url(/assets/images/background.jpg);
     background-size: cover; /* Ensures the image covers the entire viewport */
-    background-position: center; /* Centers the image */
     background-repeat: no-repeat; 
 }
 
@@ -77,13 +77,24 @@ body{
     line-height: 21px;
     font-weight: 400;
 }
-
+.small-subtitle{
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 24px;
+}
 .h1{
     font-size: 48px;
     line-height: 56px;
     font-weight: 800;
 }
-
+.h4{
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 32px;
+}
+.regular-text{
+    
+}
 .tt-control-label{
     font-weight: 700;
     font-size: 12px;
