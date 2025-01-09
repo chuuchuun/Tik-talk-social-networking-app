@@ -8,7 +8,8 @@ import { canActivateAuth } from './auth/access.guard';
 export const routes: Routes = [
     {path: '', component:LayoutComponent, children: [
         {path: '', component: SearchPageComponent},
-        {path: 'profile', component:ProfilePageComponent},
+        {path: 'search', component: SearchPageComponent},
+        {path: 'profile/:id', component:ProfilePageComponent},
         {path: 'subscribers', component:ProfilePageComponent}
     ]
     ,canActivate: [canActivateAuth]

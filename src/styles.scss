@@ -6,6 +6,7 @@
     --primary-color: #AE7AFF;
     --grey-color: #5F646D;
     --hover-color: #161616;
+    --accent-color: #98E9AB;
 }
 
 *,
@@ -48,6 +49,7 @@ body{
     cursor: pointer;
     border: 1px solid var(--dark-color);
     border-radius: 4px;
+    text-decoration: none;
 }
 
 .btn-shadow{
@@ -93,7 +95,9 @@ body{
     line-height: 32px;
 }
 .regular-text{
-    
+    font-weight: 400px;
+    font-size: 14px;
+    line-height: 21px;
 }
 .tt-control-label{
     font-weight: 700;
@@ -121,3 +125,4 @@ body{
     font-weight: 500;
     line-height: 16px;
 }
+

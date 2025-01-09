@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("tik-talk")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+82e4d244e15499b7bbebbee17d30763b4022f932")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1c6ce22e38555ebad69c86ffe979effa457e70e0")]
 [assembly: System.Reflection.AssemblyProductAttribute("tik-talk")]
 [assembly: System.Reflection.AssemblyTitleAttribute("tik-talk")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

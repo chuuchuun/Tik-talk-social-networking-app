@@ -15,7 +15,7 @@ import { Profile } from '../../data/Interfaces/profile.interface';
 })
 export class SidebarComponent {
   profileService = inject(ProfileService)
-  subscribers$ = this.profileService.getSubscribersShortList()
+  subscribers$ = this.profileService.getMySubscribersShortList()
   me =this.profileService.me
   menuItems = [
     {

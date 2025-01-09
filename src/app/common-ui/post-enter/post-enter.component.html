@@ -1,0 +1,23 @@
+@if (profile){
+    <div class="profile-card">
+        <div class="avatar-name">
+            <img 
+                [src]="profile.avatarUrl" 
+                alt="avatar" 
+                class="profile-card-avatar">
+        </div>
+        <div>
+            Enter something
+        </div>
+        <div>
+            Emoji
+        </div>
+        <div>
+            <button>
+                Send
+            </button>
+        </div>
+    </div>
+    } @else {
+        Not found
+    }

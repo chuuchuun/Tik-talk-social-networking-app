@@ -1,0 +1,33 @@
+.profile-card{
+    border: 1px solid var(--light-color);
+    padding: 32px 24px;
+    display: grid;
+    grid-template-columns: 32px 1fr 40px 44px;
+    grid-gap: 32px;
+    background: none;
+    background-color: var(--dark-color);
+}
+.avatar-name{
+    display: grid;
+    grid-template-columns: 70px 1fr;
+    grid-gap: 20px;
+}
+
+.profile-card-avatar{
+    width: 32px;
+    height: 32px;
+    border-radius: 50% ;
+    overflow: hidden;
+}
+.profile-card-name{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.profile-card-tags{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    height: min-content;
+}
+

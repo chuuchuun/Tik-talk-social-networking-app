@@ -353,4 +353,99 @@ public async Task<IActionResult> MySubscriptions( [FromQuery] string? stack = nu
 
     return Ok(response);
 }
+
+[HttpGet("{id:int}/subscribers")]
+[EnableCors("AllowFrontend")]
+public async Task<IActionResult> GetSubscribersById(
+    [FromRoute] int id,
+    [FromQuery] string? stack = null,
+    [FromQuery] string? firstLastName = null,
+    [FromQuery] string? city = null,
+    [FromQuery] string? orderBy = "id",
+    [FromQuery] int page = 1,
+    [FromQuery] int size = 50)
+{
+    var account = await _accountRepo.GetByIdAsync(id);
+
+    if (account == null)
+    {
+        return NotFound("Account not found.");
+    }
+
+    var subscribersUsernames = account.subscribers;
+
+   var subscriberAccounts = new List<Account>();
+
+foreach (var username in subscribersUsernames)
+{
+    var subscriber = await _accountRepo.GetByUsernameAsync(username);
+    if (subscriber != null)
+    {
+        subscriberAccounts.Add(subscriber);
+    }
+}
+
+    var validSubscriberAccounts = subscriberAccounts.Where(subscriber => subscriber != null).ToList();
+    if (!string.IsNullOrEmpty(stack))
+    {
+        validSubscriberAccounts = validSubscriberAccounts
+            .Where(subscriber => subscriber.stack.Contains(stack))
+            .ToList();
+    }
+
+    if (!string.IsNullOrEmpty(firstLastName))
+    {
+        validSubscriberAccounts = validSubscriberAccounts
+            .Where(subscriber => (subscriber.firstName + " " + subscriber.lastName).Contains(firstLastName, StringComparison.OrdinalIgnoreCase) ||
+                              (subscriber.lastName + " " + subscriber.firstName).Contains(firstLastName, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
+    if (!string.IsNullOrEmpty(city))
+    {
+        validSubscriberAccounts = validSubscriberAccounts
+            .Where(subscriber => subscriber.city == city)
+            .ToList();
+    }
+
+    var subscribers = validSubscriberAccounts.Select(subscriber => new AccountDto
+    {
+        Id = subscriber.Id,
+        Username = subscriber.username,
+        AvatarUrl = subscriber.avatarUrl,
+        SubscribersAmount = subscriber.subscribersAmmount,
+        FirstName = subscriber.firstName,
+        LastName = subscriber.lastName,
+        IsActive = subscriber.isActive,
+        Stack = subscriber.stack,
+        City = subscriber.city,
+        Description = subscriber.description
+    }).ToList();
+
+    subscribers = orderBy.ToLower() switch
+    {
+        "username" => subscribers.OrderBy(s => s.Username).ToList(),
+        "subscribersamount" => subscribers.OrderByDescending(s => s.SubscribersAmount).ToList(),
+        "city" => subscribers.OrderBy(s => s.City).ToList(),
+        _ => subscribers.OrderBy(s => s.Id).ToList(),
+    };
+
+    var total = subscribers.Count;
+    var totalPages = (int)Math.Ceiling((double)total / size);
+    var paginatedSubscribers = subscribers
+        .Skip((page - 1) * size)
+        .Take(size)
+        .ToList();
+
+    var response = new
+    {
+        Items = paginatedSubscribers,
+        Total = total,
+        Page = page,
+        Size = size,
+        Pages = totalPages
+    };
+
+    return Ok(response);
+}
 }
