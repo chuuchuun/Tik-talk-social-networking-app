@@ -5,6 +5,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using tik_talk.Data;
 using tik_talk.Dtos;
 using tik_talk.Interfaces;
@@ -125,22 +126,38 @@ public async Task<bool> SubscribeAsync(int id1, int id2)
         return account;
     }
 
-  public async Task<Account?> UpdateAsync(int id, Account accountModel)
+public async Task<Account?> UpdateAsync(int id, UpdateAccount accountDto)
+{
+    var account = await _context.Accounts.FirstOrDefaultAsync(a => a.Id == id);
+    if (account == null)
     {
-        var account = await _context.Accounts.FirstOrDefaultAsync(a => a.Id == id);
-        if(account == null){
-            return null;
-        }   
-        account.username = accountModel.username;    
-        account.avatarUrl = accountModel.avatarUrl;
-        account.firstName = accountModel.firstName;
-        account.lastName = accountModel.lastName;
-        account.description =  accountModel.description;
-        account.city = accountModel.city;
-        account.isActive = accountModel.isActive;
-        account.stack = accountModel.stack;
-        account.subscribersAmmount = account.subscribersAmmount;
-        await _context.SaveChangesAsync(); 
-        return account; 
+        return null;
     }
+
+    if (!string.IsNullOrWhiteSpace(accountDto.firstName))
+    {
+        account.firstName = accountDto.firstName.Trim();
+    }
+
+    if (!string.IsNullOrWhiteSpace(accountDto.lastName))
+    {
+        account.lastName = accountDto.lastName.Trim();
+    }
+
+    if (!string.IsNullOrWhiteSpace(accountDto.description))
+    {
+        account.description = accountDto.description.Trim();
+    }
+
+    if (!accountDto.stack.IsNullOrEmpty())
+    {
+        account.stack = accountDto.stack;
+    }
+
+
+    await _context.SaveChangesAsync();
+
+    return account;
+}
+
 }

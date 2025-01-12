@@ -3,7 +3,7 @@
 <nav class="mt20">
     <ul class="main-menu-list">
         <li *ngFor="let menuItem of menuItems">
-            <button class="menu-item">
+            <button class="menu-item" [routerLink]="getRouterLink(menuItem.label)">
                 <svg class="menu-item-icon"[icon]="menuItem.icon">
                 </svg>
                 <span>
@@ -36,7 +36,7 @@ All subscribers
     <path d="M0.222657 8.44531L3.66797 5L0.222656 1.55469L1.27734 0.5L5.77734 5L1.27734 9.5L0.222657 8.44531Z" fill="#AE7AFF"/>
     </svg>
 </div>
-<footer class="sidebar-footer" [routerLink]="['profile/me']">
+<footer class="sidebar-footer" [routerLink]="['settings']">
     @if (me(); as me) {
         @if(me.avatarUrl){
             <img [src]="me.avatarUrl" class="my-avatar">

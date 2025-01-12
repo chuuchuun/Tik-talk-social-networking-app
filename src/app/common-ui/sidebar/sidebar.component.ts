@@ -38,4 +38,17 @@ export class SidebarComponent {
   ngOnInit(){
     firstValueFrom(this.profileService.getMe())
   }
+
+  getRouterLink(label: string): string {
+    switch (label) {
+      case 'My page':
+        return 'profile/me';
+      case 'Chats':
+        return 'chats';
+      case 'Search':
+        return 'search';
+      default:
+        return '/';
+    }
+  }
 }

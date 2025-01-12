@@ -6,10 +6,11 @@ import { switchMap } from 'rxjs';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { PostEnterComponent } from "../../common-ui/post-enter/post-enter.component";
+import { PostFeedComponent } from "./post-feed/post-feed.component";
 
 @Component({
   selector: 'app-profile-page',
-  imports: [ProfileHeaderComponent, AsyncPipe, RouterLink, NgIf, PostEnterComponent],
+  imports: [ProfileHeaderComponent, AsyncPipe, RouterLink, NgIf, PostEnterComponent, PostFeedComponent],
   templateUrl: './profile-page.component.html',
   styleUrl: './profile-page.component.scss'
 })

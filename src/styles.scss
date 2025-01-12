@@ -7,6 +7,7 @@
     --grey-color: #5F646D;
     --hover-color: #161616;
     --accent-color: #98E9AB;
+    --ligth-transparent-color:#FFFFFFBF; 
 }
 
 *,
@@ -38,7 +39,6 @@ body{
 }
 
 .btn{
-    border: none;
     background-color: var(--primary-color);
     color: var(--dark-color);
     padding: 10px 20px;
@@ -48,10 +48,23 @@ body{
     width: 100%;
     cursor: pointer;
     border: 1px solid var(--dark-color);
-    border-radius: 4px;
+    border-radius: 2px;
     text-decoration: none;
 }
 
+.btn-black{
+    background: var(--dark-color);
+    color: var(--light-color);
+    padding: 10px 20px;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 24px;
+    width: 100%;
+    cursor: pointer;
+    border: 1px solid var(--light-color);
+    border-radius: 2px;
+    text-decoration: none;
+}
 .btn-shadow{
     position: relative;
 
@@ -126,3 +139,35 @@ body{
     line-height: 16px;
 }
 
+.tt-form-input{
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 21px;
+    border: none;
+    border-bottom:1px solid var(--light-color);
+    background: none;
+    height: 33px;
+    color: var(--light-color);
+    &:focus-visible{
+        outline: none;
+    }
+}
+.tt-form-label-text{
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 16px;
+    text-align: left;
+    color: var(--ligth-transparent-color)
+    
+}
+.tt-form-label{
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    
+}
+.tt-text-area{
+    height: 84px;
+    resize: none;
+}

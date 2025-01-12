@@ -52,17 +52,45 @@ public class AccountController : ControllerBase
             return Ok(account);
         }
     [HttpPatch]
-    [Route("{id:int}")]
-    public async Task<IActionResult> Update([FromRoute] int id, [FromBody] Account accountDTO){
-        if(!ModelState.IsValid){
+[Route("me")]
+public async Task<IActionResult> Update([FromBody] UpdateAccount accountDTO)
+{
+    try
+    {
+        Console.WriteLine("Request received with token: " + Request.Headers["Authorization"]);
+
+        var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+        var currentAccount = await _accountRepo.GetAccountFromTokenAsync(token);
+
+        if (currentAccount == null)
+        {
+            Console.WriteLine("No account found for the token.");
+            return NotFound("Current account not found.");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            Console.WriteLine("Invalid model state: " + string.Join(", ", ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage))));
             return BadRequest(ModelState);
         }
-        var account = await _accountRepo.UpdateAsync(id, accountDTO);
-        if(account == null){
+
+        var account = await _accountRepo.UpdateAsync(currentAccount.Id, accountDTO);
+        if (account == null)
+        {
+            Console.WriteLine("Account update failed.");
             return NotFound();
         }
+
+        Console.WriteLine("Account updated successfully.");
         return Ok(account);
     }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Error: " + ex.Message);
+        return StatusCode(500, "Internal server error.");
+    }
+}
+
 
       [HttpGet]
     [Route("{id:int}")]
@@ -145,9 +173,11 @@ public class AccountController : ControllerBase
         }
      
     }
+
+
     [Authorize]
-[HttpPost("subscribe/{id:int}")]
-public async Task<IActionResult> Subscribe([FromRoute] int id)
+[HttpPost("subscribe")]
+public async Task<IActionResult> Subscribe([FromBody] SubscribeRequestDto sub)
 {
     var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
     var currentAccount = await _accountRepo.GetAccountFromTokenAsync(token);
@@ -157,7 +187,7 @@ public async Task<IActionResult> Subscribe([FromRoute] int id)
         return NotFound("Current account not found.");
     }
 
-    var targetAccount = await _accountRepo.GetByIdAsync(id);
+    var targetAccount = await _accountRepo.GetByIdAsync(sub.Id);
     if (targetAccount == null)
     {
         return NotFound("Target account not found.");

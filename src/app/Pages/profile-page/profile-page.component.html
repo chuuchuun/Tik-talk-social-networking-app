@@ -12,9 +12,8 @@
             </a>
     </header>
     <main class="profile-page-main">
-        <div class="post-area">
-            <app-post-enter [profile]="profile"></app-post-enter>
-        </div>
+        <app-post-feed [profile]="profile">
+        </app-post-feed>
 
         <div>
             <div class="subscribers-line">

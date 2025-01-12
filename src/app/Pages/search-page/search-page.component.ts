@@ -11,11 +11,13 @@ import { ProfileCardComponent } from "../../common-ui/profile-card/profile-card.
 })
 export class SearchPageComponent {
   profileService : ProfileService = inject(ProfileService)
-
+  me = this.profileService.me
   profiles : Profile[] = []
   constructor(){
     this.profileService.getTestAccounts().subscribe((val) =>{
       this.profiles = val
     })
   }
+
+  
 }
