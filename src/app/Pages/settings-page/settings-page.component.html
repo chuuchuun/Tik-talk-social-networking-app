@@ -2,19 +2,27 @@
 {
     <div>
         <app-profile-header [profile]="profile" class="mb32"></app-profile-header>
-        <hr class="dashed-line">
+        <hr class="dashed-line mb32">
         @if(profile.stack.length >0){
             <div class="skills-wrapper">
                 <h3 class="mb16">
                     Skills
                 </h3>
+                <div class="profile-card-tags mb32">
+                    @for (tag of profile.stack; track $index) {
+                        <div class="skill-tag">{{tag}}</div>
+                    }
+                </div>
             </div>
         }
        @if(profile.description != null){
-        <div class="about-wrapper">
+        <div>
             <h3 class="mb16">
                 About me
             </h3>
+            <div class="about-wrapper">
+                {{profile.description}}
+            </div>
         </div>
     }
     </div>
