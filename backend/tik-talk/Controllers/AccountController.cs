@@ -300,7 +300,8 @@ foreach (var username in subscribersUsernames)
 [Authorize]
 [HttpGet("subscriptions")]
 [EnableCors("AllowFrontend")]
-public async Task<IActionResult> MySubscriptions( [FromQuery] string? stack = null,
+public async Task<IActionResult> MySubscriptions( 
+    [FromQuery] string? stack = null,
     [FromQuery] string? firstLastName = null,
     [FromQuery] string? city = null,
     [FromQuery] string? orderBy = "id",
@@ -315,22 +316,24 @@ public async Task<IActionResult> MySubscriptions( [FromQuery] string? stack = nu
         return NotFound("Account not found.");
     }
 
-    var subscribersUsernames = account.subscriptions;
+    var subscriptionsUsernames = account.subscriptions;
 
-    var subscriberAccounts = await Task.WhenAll(
-        subscribersUsernames.Select(async username => await _accountRepo.GetByUsernameAsync(username))
-    );
-    var validSubscriberAccounts = subscriberAccounts.Where(account => account != null).ToList();
+   var subscriptionAccounts = await _context.Accounts
+    .Where(a => subscriptionsUsernames.Contains(a.username))
+    .ToListAsync();
+
+
+    var validSubscriptionAccounts = subscriptionAccounts.Where(account => account != null).ToList();
     if (!string.IsNullOrEmpty(stack))
     {
-        validSubscriberAccounts = validSubscriberAccounts
+        validSubscriptionAccounts = validSubscriptionAccounts
             .Where(account => account.stack.Contains(stack))
             .ToList();
     }
 
     if (!string.IsNullOrEmpty(firstLastName))
     {
-        validSubscriberAccounts = validSubscriberAccounts
+        validSubscriptionAccounts = validSubscriptionAccounts
             .Where(account => (account.firstName + " " + account.lastName).Contains(firstLastName, StringComparison.OrdinalIgnoreCase) ||
                               (account.lastName + " " + account.firstName).Contains(firstLastName, StringComparison.OrdinalIgnoreCase))
             .ToList();
@@ -338,12 +341,12 @@ public async Task<IActionResult> MySubscriptions( [FromQuery] string? stack = nu
 
     if (!string.IsNullOrEmpty(city))
     {
-        validSubscriberAccounts = validSubscriberAccounts
+        validSubscriptionAccounts = validSubscriptionAccounts
             .Where(account => account.city == city)
             .ToList();
     }
 
-    var subscribers = validSubscriberAccounts.Select(account => new AccountDto
+    var subscriptions = validSubscriptionAccounts.Select(account => new AccountDto
     {
         Id = account.Id,
         Username = account.username,
@@ -357,17 +360,16 @@ public async Task<IActionResult> MySubscriptions( [FromQuery] string? stack = nu
         Description = account.description
     }).ToList();
 
-    subscribers = orderBy.ToLower() switch
+    subscriptions = orderBy.ToLower() switch
     {
-        "username" => subscribers.OrderBy(s => s.Username).ToList(),
-        "subscribersamount" => subscribers.OrderByDescending(s => s.SubscribersAmount).ToList(),
-        "city" => subscribers.OrderBy(s => s.City).ToList(),
-        _ => subscribers.OrderBy(s => s.Id).ToList(),
+        "username" => subscriptions.OrderBy(s => s.Username).ToList(),
+        "city" => subscriptions.OrderBy(s => s.City).ToList(),
+        _ => subscriptions.OrderBy(s => s.Id).ToList(),
     };
 
-    var total = subscribers.Count;
+    var total = subscriptions.Count;
     var totalPages = (int)Math.Ceiling((double)total / size);
-    var paginatedSubscribers = subscribers
+    var paginatedSubscribers = subscriptions
         .Skip((page - 1) * size)
         .Take(size)
         .ToList();
@@ -380,7 +382,6 @@ public async Task<IActionResult> MySubscriptions( [FromQuery] string? stack = nu
         Size = size,
         Pages = totalPages
     };
-
     return Ok(response);
 }
 

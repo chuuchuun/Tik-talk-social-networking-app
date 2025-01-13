@@ -18,6 +18,7 @@ export class ProfilePageComponent {
   profileService = inject(ProfileService)
   route = inject(ActivatedRoute)
   me$ = toObservable(this.profileService.me)
+  me = this.profileService.me
   profile$ = this.route.params
   .pipe(
     switchMap(({id}) => {

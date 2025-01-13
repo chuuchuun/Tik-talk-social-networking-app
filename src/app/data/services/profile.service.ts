@@ -47,7 +47,7 @@ export class ProfileService {
       map(res => res.total)
     )
   }
-  getAccount(id : string){
+  getAccount(id : number){
     return this.http.get<Profile>(`${this.baseApiUrl}/account/${id}`)
   }
 
@@ -60,6 +60,13 @@ export class ProfileService {
     
     // Ensure the payload is sent as JSON (wrapping the `id`)
     return this.http.post<string>(`${this.baseApiUrl}/account/subscribe`, { id });
+  }
+
+  getMySubscriptionsShortList(){
+    return this.http.get<Pageble<Profile>>(`${this.baseApiUrl}/account/subscriptions`)
+    .pipe(
+      map(res => res.items)
+    )
   }
   
 }

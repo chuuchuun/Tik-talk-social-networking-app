@@ -1,5 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { Profile } from '../../data/Interfaces/profile.interface';
+import { ProfileService } from '../../data/services/profile.service';
 
 @Component({
   selector: 'app-post-enter',
@@ -9,4 +10,7 @@ import { Profile } from '../../data/Interfaces/profile.interface';
 })
 export class PostEnterComponent {
   @Input() profile!: Profile;
+  profileService = inject(ProfileService)
+  me = this.profileService.me
+
 }
