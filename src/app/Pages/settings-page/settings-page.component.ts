@@ -1,9 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { ProfileHeaderComponent } from "../../common-ui/profile-header/profile-header.component";
 import { ProfileService } from '../../data/services/profile.service';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { interval, Subscription, switchMap, tap } from 'rxjs';
+import { firstValueFrom, interval, Subscription, switchMap, tap } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Profile } from '../../data/Interfaces/profile.interface';
@@ -16,6 +16,8 @@ import { AvatarUploadComponent } from './avatar-upload/avatar-upload.component';
 })
 export class SettingsPageComponent {
 profileService = inject(ProfileService)
+  @ViewChild(AvatarUploadComponent) avatarUploader: any
+
   me$ = toObservable(this.profileService.me)
   profile$ = this.profileService.me
   fb = inject(FormBuilder)
@@ -37,6 +39,11 @@ profileService = inject(ProfileService)
     }
     console.log("Form valid");
     
+    if(this.avatarUploader.avatar){
+      console.log("Trying to call api");
+      
+      firstValueFrom(this.profileService.uploadImage(this.avatarUploader.avatar))
+    }
     //@ts-ignore
     this.profileService.patchProfile({
       ...this.form.value,
@@ -51,6 +58,7 @@ profileService = inject(ProfileService)
         console.error("Error updating profile:", err);
       }
     });
+
   }
   
   onDiscard(){
@@ -83,6 +91,8 @@ profileService = inject(ProfileService)
         }
       })
     ).subscribe();
+  }
+  ngAfterViewInit(){
   }
 
   splitStack(stack: string | null | string[] | undefined){

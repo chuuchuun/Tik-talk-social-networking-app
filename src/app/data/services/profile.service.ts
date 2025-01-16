@@ -65,5 +65,23 @@ export class ProfileService {
       map(res => res.items)
     )
   }
+
+  uploadImage(file: File) {
+    console.log('File:', file);  // Log the file object to see if it is being passed correctly
+    const fd = new FormData();
+    
+    // Check if file is valid
+    if (file) {
+      fd.append('file', file);
+      console.log('FormData:', fd.get('file')); // Log the FormData to verify the file is appended
+    } else {
+      console.log('No file provided');
+    }
+    
+    return this.http.post<Profile>(`${this.baseApiUrl}/account/me/upload-image`, fd, {
+      withCredentials: true
+    });
+  }
+  
   
 }
