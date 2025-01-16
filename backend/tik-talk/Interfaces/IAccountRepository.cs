@@ -17,4 +17,5 @@ public interface IAccountRepository
     Task<Account?> GetByUsernameAsync(string username);
     Task<bool> SubscribeAsync(int id1, int id2);
     Task<Account> GetAccountFromTokenAsync(string token);
+    Task<Account?> UploadImage(string path,int id);
 }

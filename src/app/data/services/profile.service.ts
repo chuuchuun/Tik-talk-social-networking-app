@@ -52,13 +52,10 @@ export class ProfileService {
   }
 
   patchProfile(profile: Partial<Profile>) {
-    return this.http.patch<Profile>(`${this.baseApiUrl}/account/me`, profile); // Ensure this returns an observable
+    return this.http.patch<Profile>(`${this.baseApiUrl}/account/me`, profile);
   }
   
   subscribeToProfile(id: number) {
-    console.log("Calling API with ID:", id);
-    
-    // Ensure the payload is sent as JSON (wrapping the `id`)
     return this.http.post<string>(`${this.baseApiUrl}/account/subscribe`, { id });
   }
 

@@ -160,4 +160,18 @@ public async Task<Account?> UpdateAsync(int id, UpdateAccount accountDto)
     return account;
 }
 
+  public async Task<Account?> UploadImage(string path, int id)
+  {
+    var account = await _context.Accounts.FirstOrDefaultAsync(a => a.Id == id);
+    if (account == null)
+    {
+        return null;
+    }
+
+    account.avatarUrl = path;
+
+    await _context.SaveChangesAsync();
+
+    return(account);
+  }
 }

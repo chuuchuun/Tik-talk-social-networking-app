@@ -7,9 +7,10 @@ import { interval, Subscription, switchMap, tap } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Profile } from '../../data/Interfaces/profile.interface';
+import { AvatarUploadComponent } from './avatar-upload/avatar-upload.component';
 @Component({
   selector: 'app-settings-page',
-  imports: [ProfileHeaderComponent, AsyncPipe, ReactiveFormsModule ],
+  imports: [ProfileHeaderComponent, AsyncPipe, ReactiveFormsModule, AvatarUploadComponent ],
   templateUrl: './settings-page.component.html',
   styleUrl: './settings-page.component.scss'
 })
@@ -37,13 +38,14 @@ profileService = inject(ProfileService)
     console.log("Form valid");
     
     //@ts-ignore
-    this.profileService.patchProfile(this.form.value).subscribe({
+    this.profileService.patchProfile({
+      ...this.form.value,
+      stack: this.splitStack(this.form.value.stack)
+    }).subscribe({
       next: (updatedProfile) => {
         console.log("Profile updated successfully:", updatedProfile);
-        this.form.patchValue(updatedProfile); // Update the form with the latest data
-        
-        // Refresh the `me$` observable to update UI
-        this.profileService.me.set(updatedProfile) // Update the service state
+        this.form.patchValue(updatedProfile); 
+        this.profileService.me.set(updatedProfile)
       },
       error: (err) => {
         console.error("Error updating profile:", err);
@@ -75,10 +77,25 @@ profileService = inject(ProfileService)
             lastName: profile.lastName,
             username: profile.username, // Set username from the observable
             description: profile.description,
-            stack: profile.stack
+            //@ts-ignore
+            stack: this.mergeStack(profile.stack)
           });
         }
       })
     ).subscribe();
+  }
+
+  splitStack(stack: string | null | string[] | undefined){
+    if(Array.isArray(stack)) return stack
+    if(!stack) return []
+
+    return stack.split(',')
+  }
+
+  mergeStack(stack: string | null | string[]){
+    if(Array.isArray(stack)) return stack.join(',')
+    if(!stack) return ''
+
+    return stack
   }
 }

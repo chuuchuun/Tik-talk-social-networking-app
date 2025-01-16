@@ -281,3 +281,6 @@ C:\Users\alla\Desktop\tik-talk\backend\tik-talk\obj\Debug\net8.0\refint\tik-talk
 C:\Users\alla\Desktop\tik-talk\backend\tik-talk\obj\Debug\net8.0\tik-talk.pdb
 C:\Users\alla\Desktop\tik-talk\backend\tik-talk\obj\Debug\net8.0\tik-talk.genruntimeconfig.cache
 C:\Users\alla\Desktop\tik-talk\backend\tik-talk\obj\Debug\net8.0\ref\tik-talk.dll
+C:\Users\alla\Desktop\tik-talk\backend\tik-talk\bin\Debug\net8.0\AWSSDK.Core.dll
+C:\Users\alla\Desktop\tik-talk\backend\tik-talk\bin\Debug\net8.0\AWSSDK.S3.dll
+C:\Users\alla\Desktop\tik-talk\backend\tik-talk\bin\Debug\net8.0\dotenv.net.dll

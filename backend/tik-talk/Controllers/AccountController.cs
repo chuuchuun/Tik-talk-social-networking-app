@@ -14,6 +14,12 @@ using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Cors;
 using tik_talk.Mappers;
+using Microsoft.IdentityModel.Tokens;
+using Amazon.S3;
+using Amazon.S3.Transfer;
+using dotenv.net;
+
+
 
 namespace tik_talk.Controllers;
 
@@ -479,4 +485,58 @@ foreach (var username in subscribersUsernames)
 
     return Ok(response);
 }
+[Authorize]
+[HttpPost("me/upload-image")]
+[ProducesResponseType(StatusCodes.Status200OK)]
+[ProducesResponseType(StatusCodes.Status400BadRequest)]
+public async Task<IActionResult> UploadImage(IFormFile file)
+{
+    DotEnv.Load();
+
+    string accessKey = Environment.GetEnvironmentVariable("AWS_ACCESS_KEY_ID");
+    string secretKey = Environment.GetEnvironmentVariable("AWS_SECRET_ACCESS_KEY");
+    string regionCode = Environment.GetEnvironmentVariable("AWS_REGION");
+    
+    Amazon.RegionEndpoint region = Amazon.RegionEndpoint.GetBySystemName(regionCode);
+    string bucketName = Environment.GetEnvironmentVariable("AWS_BUCKET_NAME");
+
+    var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+    var account = await _accountRepo.GetAccountFromTokenAsync(token);
+
+    if (account == null)
+    {
+        return NotFound("Account not found.");
+    }
+
+    if (file == null || file.Length == 0)
+    {
+        return BadRequest("File is not provided or empty.");
+    }
+
+    try
+    {
+        using var client = new AmazonS3Client(accessKey, secretKey, region);
+        var uploadRequest = new TransferUtilityUploadRequest
+        {
+            InputStream = file.OpenReadStream(),
+            Key = $"{Guid.NewGuid()}_{file.FileName}", // Generate unique file name
+            BucketName = bucketName,
+            ContentType = file.ContentType,
+            CannedACL = S3CannedACL.PublicRead // Make the file publicly accessible
+        };
+
+        var transferUtility = new TransferUtility(client);
+        await transferUtility.UploadAsync(uploadRequest);
+
+        var fileUrl = $"https://{bucketName}.s3.{region.SystemName}.amazonaws.com/{uploadRequest.Key}";
+
+        await _accountRepo.UploadImage(fileUrl, account.Id);
+        return Ok(account);
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(StatusCodes.Status500InternalServerError, $"Error uploading file: {ex.Message}");
+    }
+}
+
 }
