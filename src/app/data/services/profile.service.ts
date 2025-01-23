@@ -3,7 +3,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { Observable } from 'rxjs/internal/Observable';
 import { Profile } from '../Interfaces/profile.interface';
 import { Pageble } from '../Interfaces/pageble.interface';
-import { map, single, tap } from 'rxjs';
+import { map, pipe, single, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +14,10 @@ export class ProfileService {
   me = signal<Profile | null>(null)
   getTestAccounts(){
       //return this.http.get<Profile[]>(`${this.baseApiUrl}account/test_accounts`)
-      return this.http.get<Profile[]>(`${this.baseApiUrl}/account`)
+      return this.http.get<Pageble<Profile>>(`${this.baseApiUrl}/account`)
+        .pipe(
+          map(res => res.items)
+        )
     }
 
   getMe(){
@@ -82,6 +85,7 @@ export class ProfileService {
       withCredentials: true
     });
   }
+  
   
   
 }

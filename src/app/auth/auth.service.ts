@@ -48,12 +48,32 @@ export class AuthService {
     )
   }
   
-  logout(){
-    this.cookiesService.deleteAll()
-    this.token = null
-    this.refreshToken = null
-    this.router.navigate(['/login'])
+  logout() {
+    console.log("Inside logout method");
+  
+    // Clear cookies
+    this.cookiesService.deleteAll();
+    console.log("Cookies cleared");
+  
+    // Call logout API
+    this.http.post<String>(`${this.baseApiUrl}/auth/logout`, {
+      accessToken: this.token, 
+      refreshToken: this.refreshToken
+    }).subscribe({
+      next: (response) => {
+        console.log("Logout API response:", response);
+      },
+      error: (err) => {
+        console.error("Logout error:", err);
+      }
+    });
+  
+    // Reset tokens and navigate to login page
+    this.token = null;
+    this.refreshToken = null;
+    this.router.navigate(['/login']);
   }
+  
 saveTokens(response : TokenResponse) {
     console.log('Login response:', response); // Check the response here
     this.token = response.accessToken;

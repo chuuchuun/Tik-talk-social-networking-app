@@ -1,0 +1,26 @@
+<div class="all-chats-wrapper">
+    <div class="search">
+        Search
+    </div>
+    <div class="chats-list">
+        <app-chat-card-component>
+    
+        </app-chat-card-component>
+    
+    </div>
+</div>
+
+<div class="specific-chat">
+    <div class="chat-header">
+        Header
+    </div>
+    <div class="chat-main-area">
+        Messages
+    @if(me()){
+        <app-post-enter [profile]="me()!">
+
+        </app-post-enter>
+    }
+</div>
+
+</div>

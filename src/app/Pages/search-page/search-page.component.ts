@@ -5,10 +5,11 @@ import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { ProfileCardComponent } from '../../common-ui/profile-card/profile-card.component';
 import { AsyncPipe, NgFor, NgForOf, NgIf } from '@angular/common';
+import { ProfileFiltersComponent } from "./profile-filters/profile-filters.component";
 
 @Component({
   selector: 'app-search-page',
-  imports: [ProfileCardComponent],
+  imports: [ProfileCardComponent, ProfileFiltersComponent],
   templateUrl: './search-page.component.html',
   styleUrl: './search-page.component.scss',
 })

@@ -121,4 +121,33 @@ public async Task<IActionResult> RefreshToken([FromBody]TokenDto tokens)
     }
 }
 
+[HttpPost("logout")]
+public async Task<IActionResult> Logout([FromBody]TokenDto tokens)
+{
+    try
+    {
+        var username = _tokenService.ExtractUsernameFromToken(tokens.accessToken);
+        if (string.IsNullOrEmpty(username))
+        {
+            return Unauthorized("Invalid token: username not found");
+        }
+
+        var identityUser = await _userManager.FindByNameAsync(username);
+        if (identityUser == null || identityUser.refreshToken != tokens.refreshToken || identityUser.refreshTokenExpiry < DateTime.Now)
+        {
+            return Unauthorized("Invalid refresh token or expired token");
+        }
+        identityUser.refreshToken = null;
+        identityUser.refreshTokenExpiry = null;
+
+        await _userManager.UpdateAsync(identityUser);
+
+        return Ok(new { message = "Logout successful" });
+    }
+    catch (Exception e)
+    {
+        return StatusCode(500, e.Message);
+    }
+}
+
 }

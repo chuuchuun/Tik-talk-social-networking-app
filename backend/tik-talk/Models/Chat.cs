@@ -8,8 +8,10 @@ namespace tik_talk.Models;
 
 public class Chat
 {
-    public int Id {get;set;}
-    public AccountDto userFirst {get;set;}
-    public AccountDto userSecond{get;set;} 
+    public int id {get;set;}
+    public int userFirstId { get; set; } // Foreign Key for UserFirst
+    public int userSecondId { get; set; } // Foreign Key for UserSecond
+        public Account userFirst {get;set;}
+    public Account userSecond{get;set;} 
     public List<string> messages{get;set;} = new List<string>();
 }

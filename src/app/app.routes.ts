@@ -5,14 +5,16 @@ import { ProfilePageComponent } from './Pages/profile-page/profile-page.componen
 import { LayoutComponent } from './common-ui/layout/layout.component';
 import { canActivateAuth } from './auth/access.guard';
 import { SettingsPageComponent } from './Pages/settings-page/settings-page.component';
+import { ChatsPageComponent } from './Pages/chats-page/chats-page.component';
 
 export const routes: Routes = [
     {path: '', component:LayoutComponent, children: [
-        {path: '', component: SearchPageComponent},
+        {path: '', redirectTo: 'profile/me', pathMatch: 'full'},
         {path: 'search', component: SearchPageComponent},
         {path: 'profile/:id', component:ProfilePageComponent},
         {path: 'subscribers', component:ProfilePageComponent},
-        {path: 'settings', component: SettingsPageComponent}
+        {path: 'settings', component: SettingsPageComponent},
+        {path: 'chats', component: ChatsPageComponent}
     ]
     ,canActivate: [canActivateAuth]
 },

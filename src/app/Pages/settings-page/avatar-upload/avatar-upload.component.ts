@@ -1,5 +1,6 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { DndDirective } from '../../../common-ui/directives/dnd.directive';
+import { ProfileService } from '../../../data/services/profile.service';
 
 @Component({
   selector: 'app-avatar-upload',
@@ -8,9 +9,17 @@ import { DndDirective } from '../../../common-ui/directives/dnd.directive';
   styleUrl: './avatar-upload.component.scss'
 })
 export class AvatarUploadComponent {
-preview = signal<string>('/assets/images/profile-placeholder.png')
+preview = signal<string | null | undefined>('/assets/images/profile-placeholder.png')
 avatar: File | null= null  
+profileService = inject(ProfileService)
 
+ngOnInit(){
+  if(this.profileService.getMe().subscribe(
+    val=> val.avatarUrl)){
+      this.preview.set(this.profileService.me()?.avatarUrl)
+
+  }
+}
 fileBrowserHandler($event: Event) {
   const file = (event?.target as HTMLInputElement)?.files?.[0] as File
   this.proccessFile(file)

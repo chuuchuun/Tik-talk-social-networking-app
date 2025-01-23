@@ -9,5 +9,5 @@ namespace tik_talk.Models;
 public class Auth: IdentityUser
 {
     public string? refreshToken { get; set; }
-    public DateTime refreshTokenExpiry { get; set; }
+    public DateTime? refreshTokenExpiry { get; set; }
 }

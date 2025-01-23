@@ -2,14 +2,14 @@ import { Component, inject } from '@angular/core';
 import { SvgIconComponent } from '../svg-icon/svg-icon.component';
 import { AsyncPipe, JsonPipe, NgFor } from '@angular/common';
 import { SubscriberCardComponent } from "./subscriber-card/subscriber-card.component";
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { ProfileService } from '../../data/services/profile.service';
 import { firstValueFrom } from 'rxjs';
 import { Profile } from '../../data/Interfaces/profile.interface';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [SvgIconComponent, NgFor, SubscriberCardComponent, RouterLink, AsyncPipe, JsonPipe],
+  imports: [RouterLinkActive, SvgIconComponent, NgFor, SubscriberCardComponent, RouterLink, AsyncPipe, JsonPipe],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss'
 })

@@ -1,0 +1,56 @@
+:host{
+    background-color: var(--dark-color);
+    display: grid;
+    grid-template-columns:380px 1fr;
+    height: 93%;
+}
+
+.search{
+    border-top: 1px solid var(--light-color);
+    border-left: 1px solid var(--light-color);
+    border-bottom: 1px solid var(--light-color);
+    border-top-left-radius: 2px;
+    padding: 16px 20px;
+
+}
+
+.all-chats-wrapper{
+    border-bottom-left-radius: 2px;
+    border-left: 1px solid var(--light-color);
+    border-bottom: 1px solid var(--light-color);
+}
+.chats-list{
+    border-bottom-left-radius: 2px;
+    border-left: 1px solid var(--light-color);
+    border-bottom: 1px solid var(--light-color);
+    height: 100%;
+    background-color: var(--dark-color);
+}
+
+.chat-header{
+    border-top-right-radius: 2px;
+    border: 1px solid var(--light-color);
+    padding: 16px 20px;
+}
+
+.specific-chat-area{
+    border-bottom-left-radius: 2px;
+    border-left: 1px solid var(--light-color);
+    border-bottom: 1px solid var(--light-color);
+}
+.chat-main-area{
+    height: 100%;
+    background-color: var(--dark-color);
+    border-bottom-right-radius: 2px;
+    border-right: 1px solid var(--light-color);
+    border-left: 1px solid var(--light-color);
+    border-bottom: 1px solid var(--light-color);
+    padding: 16px 20px;
+
+}
+
+app-post-enter{
+    position:fixed;
+    bottom: 40px;
+}
+

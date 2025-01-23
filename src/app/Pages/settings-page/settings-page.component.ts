@@ -8,6 +8,7 @@ import { AsyncPipe } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Profile } from '../../data/Interfaces/profile.interface';
 import { AvatarUploadComponent } from './avatar-upload/avatar-upload.component';
+import { AuthService } from '../../auth/auth.service';
 @Component({
   selector: 'app-settings-page',
   imports: [ProfileHeaderComponent, AsyncPipe, ReactiveFormsModule, AvatarUploadComponent ],
@@ -17,7 +18,7 @@ import { AvatarUploadComponent } from './avatar-upload/avatar-upload.component';
 export class SettingsPageComponent {
 profileService = inject(ProfileService)
   @ViewChild(AvatarUploadComponent) avatarUploader: any
-
+  authService = inject(AuthService)
   me$ = toObservable(this.profileService.me)
   profile$ = this.profileService.me
   fb = inject(FormBuilder)
@@ -39,9 +40,7 @@ profileService = inject(ProfileService)
     }
     console.log("Form valid");
     
-    if(this.avatarUploader.avatar){
-      console.log("Trying to call api");
-      
+    if(this.avatarUploader.avatar){      
       firstValueFrom(this.profileService.uploadImage(this.avatarUploader.avatar))
     }
     //@ts-ignore
@@ -107,5 +106,11 @@ profileService = inject(ProfileService)
     if(!stack) return ''
 
     return stack
+  }
+
+  onLogout(){
+  console.log("Trying to call auth service");
+  
+   return this.authService.logout()
   }
 }

@@ -50,8 +50,14 @@ body{
     border: 1px solid var(--dark-color);
     border-radius: 2px;
     text-decoration: none;
+    height: 44px;
 }
-
+.icon-button{
+    display: grid;
+    grid-template-columns: 1fr 16px;
+    grid-gap: 8px;
+    align-items: center;
+}
 .btn-black{
     background: var(--dark-color);
     color: var(--light-color);

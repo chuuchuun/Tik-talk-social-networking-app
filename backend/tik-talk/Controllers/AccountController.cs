@@ -37,15 +37,86 @@ public class AccountController : ControllerBase
 
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetAll(){
-        if(!ModelState.IsValid){
-            return BadRequest(ModelState);
-        }
-        var accounts = await _accountRepo.GetAllAsync();
-        var accountDTO = accounts.Select(s => s.ToAccountDto()).ToList();
-        return Ok(accountDTO);
+   [HttpGet]
+public async Task<IActionResult> GetAll(
+    [FromQuery] string? stack = null,
+    [FromQuery] string? firstLastName = null,
+    [FromQuery] string? city = null,
+    [FromQuery] string? orderBy = "id",
+    [FromQuery] int page = 1,
+    [FromQuery] int size = 50)
+{
+    // Validate page and size parameters
+    if (page <= 0 || size <= 0)
+        return BadRequest(new { message = "Page and size must be greater than zero." });
+
+    // Fetch all accounts
+    var accounts = await _accountRepo.GetAllAsync();
+
+    // Apply filters
+    if (!string.IsNullOrEmpty(stack))
+    {
+        accounts = accounts
+            .Where(account => account.stack.Contains(stack))
+            .ToList();
     }
+
+    if (!string.IsNullOrEmpty(firstLastName))
+    {
+        var nameFilter = firstLastName.ToLower();
+        accounts = accounts
+            .Where(account =>
+                (!string.IsNullOrEmpty(account.firstName) && !string.IsNullOrEmpty(account.lastName)) &&
+                (
+                    (account.firstName + " " + account.lastName).ToLower().Contains(nameFilter) ||
+                    (account.lastName + " " + account.firstName).ToLower().Contains(nameFilter)
+                ))
+            .ToList();
+    }
+
+    if (!string.IsNullOrEmpty(city))
+    {
+        accounts = accounts
+            .Where(account => !string.IsNullOrEmpty(account.city) && account.city.Equals(city, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
+    // Map to DTOs
+    var accountDTO = accounts
+        .Select(account => account.ToAccountDto())
+        .ToList();
+
+    // Apply sorting
+    accountDTO = orderBy.ToLower() switch
+    {
+        "username" => accountDTO.OrderBy(dto => dto.Username).ToList(),
+        "subscribersamount" => accountDTO.OrderByDescending(dto => dto.SubscribersAmount).ToList(),
+        "city" => accountDTO.OrderBy(dto => dto.City).ToList(),
+        _ => accountDTO.OrderBy(dto => dto.Id).ToList(),
+    };
+
+    // Get total and apply pagination
+    var total = accountDTO.Count;
+    var totalPages = (int)Math.Ceiling((double)total / size);
+
+    var paginatedAccounts = accountDTO
+        .Skip((page - 1) * size)
+        .Take(size)
+        .ToList();
+
+    // Prepare response
+    var response = new
+    {
+        Items = paginatedAccounts,
+        Total = total,
+        Page = page,
+        Size = size,
+        Pages = totalPages
+    };
+
+    return Ok(response);
+}
+
 
 
     [HttpPost]

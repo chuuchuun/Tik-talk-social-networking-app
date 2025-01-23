@@ -31,3 +31,29 @@
     height: min-content;
 }
 
+.profile-card-action-buttons{
+    width: 232px;
+    display: grid;
+    grid-template-columns: 1fr 44px ;
+    grid-gap: 6px;
+}
+.subscribed-buttons{
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    grid-gap: 6px;
+}
+
+.subscribed-icon{
+    height: 44px;
+    width: 44px;
+    border: 1px solid var(--primary-color);
+    border-radius: 2px;
+    padding: 14px;
+    align-items: center;
+}
+
+.icon{
+    align-items: center;
+    padding: 14px;
+    justify-self: center;
+}

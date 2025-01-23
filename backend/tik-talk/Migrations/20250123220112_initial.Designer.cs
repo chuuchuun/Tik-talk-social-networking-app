@@ -12,7 +12,7 @@ using tik_talk.Data;
 namespace tik_talk.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250106132437_initial")]
+    [Migration("20250123220112_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -54,13 +54,13 @@ namespace tik_talk.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "bfa3c7be-f943-40fd-adb0-fc830c0ca07d",
+                            Id = "93ace1f3-de6c-4d52-90a1-d4eb2030865c",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "5d00af91-d374-4cde-8c93-e61430242371",
+                            Id = "34d02b27-9217-4508-b6cd-42efec82eb5d",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -282,7 +282,7 @@ namespace tik_talk.Migrations
                     b.Property<string>("refreshToken")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("refreshTokenExpiry")
+                    b.Property<DateTime?>("refreshTokenExpiry")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -296,6 +296,33 @@ namespace tik_talk.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("tik_talk.Models.Chat", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<string>("messages")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("userFirstId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("userSecondId")
+                        .HasColumnType("int");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("userFirstId");
+
+                    b.HasIndex("userSecondId");
+
+                    b.ToTable("Chats");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -347,6 +374,32 @@ namespace tik_talk.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("tik_talk.Models.Chat", b =>
+                {
+                    b.HasOne("tik_talk.Models.Account", "userFirst")
+                        .WithMany("chatsAsFirstUser")
+                        .HasForeignKey("userFirstId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("tik_talk.Models.Account", "userSecond")
+                        .WithMany("chatsAsSecondUser")
+                        .HasForeignKey("userSecondId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("userFirst");
+
+                    b.Navigation("userSecond");
+                });
+
+            modelBuilder.Entity("tik_talk.Models.Account", b =>
+                {
+                    b.Navigation("chatsAsFirstUser");
+
+                    b.Navigation("chatsAsSecondUser");
                 });
 #pragma warning restore 612, 618
         }

@@ -3,13 +3,15 @@
 <nav class="mt20">
     <ul class="main-menu-list">
         <li *ngFor="let menuItem of menuItems">
-            <button class="menu-item" [routerLink]="getRouterLink(menuItem.label)">
+            <a class="menu-item" 
+            [routerLink]="getRouterLink(menuItem.label)"
+            routerLinkActive="active">
                 <svg class="menu-item-icon"[icon]="menuItem.icon">
                 </svg>
                 <span>
                    {{menuItem.label}}
                 </span>
-            </button>
+            </a>
         </li>
     </ul>
 </nav>

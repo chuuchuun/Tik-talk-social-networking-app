@@ -56,7 +56,7 @@ namespace tik_talk.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     refreshToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    refreshTokenExpiry = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    refreshTokenExpiry = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -75,6 +75,31 @@ namespace tik_talk.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Chats",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    userFirstId = table.Column<int>(type: "int", nullable: false),
+                    userSecondId = table.Column<int>(type: "int", nullable: false),
+                    messages = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Chats", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_Chats_Accounts_userFirstId",
+                        column: x => x.userFirstId,
+                        principalTable: "Accounts",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Chats_Accounts_userSecondId",
+                        column: x => x.userSecondId,
+                        principalTable: "Accounts",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -188,8 +213,8 @@ namespace tik_talk.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "5d00af91-d374-4cde-8c93-e61430242371", null, "User", "USER" },
-                    { "bfa3c7be-f943-40fd-adb0-fc830c0ca07d", null, "Admin", "ADMIN" }
+                    { "34d02b27-9217-4508-b6cd-42efec82eb5d", null, "User", "USER" },
+                    { "93ace1f3-de6c-4d52-90a1-d4eb2030865c", null, "Admin", "ADMIN" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -230,14 +255,21 @@ namespace tik_talk.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Chats_userFirstId",
+                table: "Chats",
+                column: "userFirstId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Chats_userSecondId",
+                table: "Chats",
+                column: "userSecondId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Accounts");
-
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -254,10 +286,16 @@ namespace tik_talk.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Chats");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Accounts");
         }
     }
 }

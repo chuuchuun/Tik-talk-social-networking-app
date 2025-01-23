@@ -12,6 +12,7 @@
 }
 
 .menu-item{
+    text-decoration: none;
     padding: 16px 12px;
     cursor: pointer;
     border: none;
@@ -28,6 +29,7 @@
     width: 100%;
     text-align: left;
     border-radius: 2px;
+    &.active,
     &:hover,
     &:focus-visible{
         background: var(--hover-color);
@@ -72,6 +74,8 @@
         background: var(--hover-color);
         color: var(--primary-color);
     }
+
+    
 
 
 }

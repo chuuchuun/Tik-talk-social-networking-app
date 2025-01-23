@@ -1,0 +1,18 @@
+.filters-wrapper{
+    display: grid;
+    grid-template-columns: 1fr 46px;
+    grid-gap: 40px;
+    background-color: var(--dark-color);
+}
+
+.filter-area{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-gap: 40px;
+}
+.filter-input{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    
+}
