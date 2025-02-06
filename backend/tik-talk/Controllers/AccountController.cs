@@ -39,6 +39,7 @@ public class AccountController : ControllerBase
 
    [HttpGet]
 public async Task<IActionResult> GetAll(
+    [FromQuery] string? username = null,
     [FromQuery] string? stack = null,
     [FromQuery] string? firstLastName = null,
     [FromQuery] string? city = null,
@@ -52,7 +53,15 @@ public async Task<IActionResult> GetAll(
 
     // Fetch all accounts
     var accounts = await _accountRepo.GetAllAsync();
-
+    if(!string.IsNullOrEmpty(username)){
+        var usernameFilter = username.ToLower();
+            accounts = accounts
+                .Where(account =>
+                    (!string.IsNullOrEmpty(account.username)) &&
+                    account.username.ToLower().Contains(usernameFilter)                
+                )
+            .ToList();
+    }
     // Apply filters
     if (!string.IsNullOrEmpty(stack))
     {
@@ -66,7 +75,7 @@ public async Task<IActionResult> GetAll(
         var nameFilter = firstLastName.ToLower();
         accounts = accounts
             .Where(account =>
-                (!string.IsNullOrEmpty(account.firstName) && !string.IsNullOrEmpty(account.lastName)) &&
+                !string.IsNullOrEmpty(account.firstName) && !string.IsNullOrEmpty(account.lastName) &&
                 (
                     (account.firstName + " " + account.lastName).ToLower().Contains(nameFilter) ||
                     (account.lastName + " " + account.firstName).ToLower().Contains(nameFilter)

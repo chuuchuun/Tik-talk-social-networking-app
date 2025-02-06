@@ -3,16 +3,24 @@
     grid-template-columns: 1fr 46px;
     grid-gap: 40px;
     background-color: var(--dark-color);
+    padding: 16px 20px;
+    border: 1px solid var(--light-color);
 }
 
 .filter-area{
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: repeat(4, 1fr);
     grid-gap: 40px;
+   
 }
 .filter-input{
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     
+}
+.filter-button{
+    align-items: center;
+    padding: 14px;
+
 }

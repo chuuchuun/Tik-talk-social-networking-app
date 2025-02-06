@@ -9,22 +9,17 @@ import { ProfileFiltersComponent } from "./profile-filters/profile-filters.compo
 
 @Component({
   selector: 'app-search-page',
-  imports: [ProfileCardComponent, ProfileFiltersComponent],
+  imports: [AsyncPipe, ProfileCardComponent, ProfileFiltersComponent],
   templateUrl: './search-page.component.html',
   styleUrl: './search-page.component.scss',
 })
 export class SearchPageComponent {
   profileService: ProfileService = inject(ProfileService);
-  me = this.profileService.me; // Current user's profile
-  profiles: Profile[] = []; // List of profiles
-
+  me = this.profileService.me;
+  profiles = this.profileService.filteredProfiles
   constructor() {
-    // Fetch the list of test accounts
-    this.profileService.getTestAccounts().subscribe((val) => {
-      this.profiles = val;
-    });
+   
   }
 
-  // Method to check if the current profile is subscribed
   
 }

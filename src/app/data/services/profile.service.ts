@@ -12,6 +12,7 @@ export class ProfileService {
   http:HttpClient = inject(HttpClient)
   baseApiUrl: string = 'http://localhost:5178/api'
   me = signal<Profile | null>(null)
+  filteredProfiles = signal<Profile[]>([])
   getTestAccounts(){
       //return this.http.get<Profile[]>(`${this.baseApiUrl}account/test_accounts`)
       return this.http.get<Pageble<Profile>>(`${this.baseApiUrl}/account`)
@@ -90,4 +91,14 @@ export class ProfileService {
     return this.http.get<Object>(`${this.baseApiUrl}/chat`)
   }
   
+  filterProfiles(params: Record<string, any>){
+    return this.http.get<Pageble<Profile>>(`${this.baseApiUrl}/account`,
+      {
+        params
+      }
+    )
+    .pipe(
+      tap(res => this.filteredProfiles.set(res.items))
+    )
+  }
 }
