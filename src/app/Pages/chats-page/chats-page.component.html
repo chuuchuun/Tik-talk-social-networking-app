@@ -1,6 +1,6 @@
 <div class="all-chats-wrapper">
     <div class="search">
-        Search
+        <input type="text" class="tt-form-input"placeholder="Search...">
     </div>
     <div class="chats-list">
         <app-chat-card-component>
@@ -15,12 +15,14 @@
         Header
     </div>
     <div class="chat-main-area">
-        Messages
-    @if(me()){
-        <app-post-enter [profile]="me()!">
-
-        </app-post-enter>
-    }
-</div>
+        <div class="messages">
+            Messages
+        </div>
+        <div class="enter-message">
+        @if(me()){
+            <app-post-enter [profile]="me()!"/>
+        }
+        </div>
+    </div>
 
 </div>

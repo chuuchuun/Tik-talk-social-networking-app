@@ -86,6 +86,8 @@ export class ProfileService {
     });
   }
   
-  
+  getMyChats(){
+    return this.http.get<Object>(`${this.baseApiUrl}/chat`)
+  }
   
 }
