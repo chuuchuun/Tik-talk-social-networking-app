@@ -3,6 +3,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { Observable } from 'rxjs/internal/Observable';
 import { Profile } from '../Interfaces/profile.interface';
 import { Pageble } from '../Interfaces/pageble.interface';
+import {Chat} from '../Interfaces/chat.interface';
 import { map, pipe, single, tap } from 'rxjs';
 
 @Injectable({
@@ -13,6 +14,7 @@ export class ProfileService {
   baseApiUrl: string = 'http://localhost:5178/api'
   me = signal<Profile | null>(null)
   filteredProfiles = signal<Profile[]>([])
+  myChats = signal<Chat[]>([])
   getTestAccounts(){
       //return this.http.get<Profile[]>(`${this.baseApiUrl}account/test_accounts`)
       return this.http.get<Pageble<Profile>>(`${this.baseApiUrl}/account`)
@@ -88,7 +90,10 @@ export class ProfileService {
   }
   
   getMyChats(){
-    return this.http.get<Object>(`${this.baseApiUrl}/chat`)
+    return this.http.get<Chat[]>(`${this.baseApiUrl}/chat/get_my_chats`)
+    .pipe(
+      tap(res => this.myChats.set(res))
+    )
   }
   
   filterProfiles(params: Record<string, any>){
@@ -101,4 +106,5 @@ export class ProfileService {
       tap(res => this.filteredProfiles.set(res.items))
     )
   }
+
 }

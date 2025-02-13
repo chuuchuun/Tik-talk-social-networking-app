@@ -3,9 +3,11 @@
         <input type="text" class="tt-form-input"placeholder="Search...">
     </div>
     <div class="chats-list">
-        <app-chat-card-component>
-    
-        </app-chat-card-component>
+        @for (chat of chats() | async; track chat.id){
+            <app-chat-card-component
+              [chat]="chat"
+              ></app-chat-card-component>
+            }
     
     </div>
 </div>

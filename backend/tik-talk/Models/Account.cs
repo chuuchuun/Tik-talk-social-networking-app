@@ -22,6 +22,4 @@ public class Account
     public string description{get;set;} = string.Empty;
     public List<string> subscribers{get;set;} = new List<string>();
     public List<string> subscriptions{get;set;} = new List<string>();
-public List<Chat> chatsAsFirstUser { get; set; } = new List<Chat>();
-    public List<Chat> chatsAsSecondUser { get; set; } = new List<Chat>();
 }

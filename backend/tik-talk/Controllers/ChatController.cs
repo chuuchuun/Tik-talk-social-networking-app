@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using tik_talk.Data;
+using tik_talk.Dtos;
 using tik_talk.Interfaces;
 using tik_talk.Mappers;
 using tik_talk.Models;
@@ -42,13 +44,13 @@ public class ChatController : ControllerBase
         }
 
         var secondUser = await  _accountRepo.GetByIdAsync(user_id);
-        var chat = await _chatRepo.CreateAsync(currentAccount, secondUser);
+        var chat = await _chatRepo.CreateAsync(currentAccount.Id, secondUser.Id);
 
         return Ok(chat);
     }
 
     [HttpDelete]
-[Route("{id:int}")]
+    [Route("{id:int}")]
 public async Task<IActionResult> DeleteChat(int id)
 {
     var chat = await _chatRepo.DeleteAsync(id);
@@ -61,5 +63,41 @@ public async Task<IActionResult> DeleteChat(int id)
     public async Task<IActionResult> GetAllChats(){
         var chats = await _chatRepo.GetAllAsync();
         return Ok(chats);
+    }
+
+    [Authorize]
+    [HttpGet("get_my_chats")]
+    [EnableCors("AllowFrontend")] 
+
+    public async Task<IActionResult> GetMyChats()
+    {
+        var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+        try
+        {
+            var myAccount = await _accountRepo.GetAccountFromTokenAsync(token);
+            var myId = myAccount.Id;
+            var chats = await _chatRepo.GetAllAsync();
+            var myChats = chats.Where(chat => chat.userFirst== myId || chat.userSecond == myId).ToList();
+            List<ChatReadDto> chatDtos = new List<ChatReadDto>();
+            foreach(Chat chat in chats){
+                chatDtos.Add(new ChatReadDto{
+                    id = chat.id,
+                    userFirst = chat.userFirst,
+                    userSecond = chat.userSecond,
+                    messages = chat.messages
+                });
+            }
+            
+            return Ok(chatDtos);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+     
     }
 }

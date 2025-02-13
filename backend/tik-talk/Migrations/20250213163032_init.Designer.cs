@@ -12,8 +12,8 @@ using tik_talk.Data;
 namespace tik_talk.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250123220112_initial")]
-    partial class initial
+    [Migration("20250213163032_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,13 +54,13 @@ namespace tik_talk.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "93ace1f3-de6c-4d52-90a1-d4eb2030865c",
+                            Id = "d006953c-b987-40c4-970b-5aeeb0f09d5c",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "34d02b27-9217-4508-b6cd-42efec82eb5d",
+                            Id = "4ea15d45-6a31-4b7f-8ec9-f4bdb500a156",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -310,17 +310,13 @@ namespace tik_talk.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("userFirstId")
+                    b.Property<int>("userFirst")
                         .HasColumnType("int");
 
-                    b.Property<int>("userSecondId")
+                    b.Property<int>("userSecond")
                         .HasColumnType("int");
 
                     b.HasKey("id");
-
-                    b.HasIndex("userFirstId");
-
-                    b.HasIndex("userSecondId");
 
                     b.ToTable("Chats");
                 });
@@ -374,32 +370,6 @@ namespace tik_talk.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("tik_talk.Models.Chat", b =>
-                {
-                    b.HasOne("tik_talk.Models.Account", "userFirst")
-                        .WithMany("chatsAsFirstUser")
-                        .HasForeignKey("userFirstId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("tik_talk.Models.Account", "userSecond")
-                        .WithMany("chatsAsSecondUser")
-                        .HasForeignKey("userSecondId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("userFirst");
-
-                    b.Navigation("userSecond");
-                });
-
-            modelBuilder.Entity("tik_talk.Models.Account", b =>
-                {
-                    b.Navigation("chatsAsFirstUser");
-
-                    b.Navigation("chatsAsSecondUser");
                 });
 #pragma warning restore 612, 618
         }

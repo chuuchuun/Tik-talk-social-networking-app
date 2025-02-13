@@ -1,3 +1,14 @@
-<div>
-    
-</div>
+@if(chat){
+    <div class="chat-wrapper">
+        <img class="avatar" [src]="picture">
+        <div class="message-preview">
+           <div class="medium-text username-wrapper">
+            {{anotherUsername}}
+           </div>
+           <div class="medium-text">
+                {{lastMessage}}
+           </div>
+        </div>
+    </div>
+}
+

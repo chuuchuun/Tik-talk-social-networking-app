@@ -22,20 +22,6 @@ public class ApplicationDBContext : IdentityDbContext<Auth>
     public DbSet<Chat> Chats{get;set;}
     protected override void OnModelCreating(ModelBuilder builder)
     {
-         builder.Entity<Chat>()
-        .HasOne(c => c.userFirst)
-        .WithMany(a => a.chatsAsFirstUser) // Use a distinct navigation property
-        .HasForeignKey(c => c.userFirstId)
-        .OnDelete(DeleteBehavior.NoAction);
-
-    // Define the relationship for userSecond
-    builder.Entity<Chat>()
-        .HasOne(c => c.userSecond)
-        .WithMany(a => a.chatsAsSecondUser) // Use a distinct navigation property
-        .HasForeignKey(c => c.userSecondId)
-        .OnDelete(DeleteBehavior.NoAction);
-
-        
         base.OnModelCreating(builder);
         List<IdentityRole> roles = new List<IdentityRole>{
             new IdentityRole{

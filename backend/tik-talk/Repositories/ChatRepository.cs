@@ -18,8 +18,8 @@ public class ChatRepository : IChatRepository
     {
         _context = context;
     }
-public async Task<Chat?> CreateAsync(Account user1, Account user2)
-{
+public async Task<Chat?> CreateAsync(int user1, int user2)
+{ 
     if (user1 == null || user2 == null)
     {
         throw new ArgumentNullException("Both users must be valid.");
@@ -29,12 +29,7 @@ public async Task<Chat?> CreateAsync(Account user1, Account user2)
     {
         userFirst = user1,
         userSecond = user2,
-        userFirstId = user1.Id,
-        userSecondId = user2.Id
     };
-
-    user1.chatsAsFirstUser.Add(chat);  
-    user2.chatsAsSecondUser.Add(chat);
 
     await _context.Chats.AddAsync(chat);
     await _context.SaveChangesAsync();
@@ -53,8 +48,6 @@ public async Task<Chat?> CreateAsync(Account user1, Account user2)
     var accountFirst = chatToDelete.userFirst;
     var accountSecond = chatToDelete.userSecond;
 
-    accountFirst.chatsAsFirstUser.Remove(chatToDelete);
-    accountSecond.chatsAsSecondUser.Remove(chatToDelete);
     _context.Chats.Remove(chatToDelete);
     await _context.SaveChangesAsync();
 
@@ -66,10 +59,29 @@ public async Task<Chat?> CreateAsync(Account user1, Account user2)
     return await _context.Chats.ToListAsync();
   }
 
-  public Task<Chat?> GetByIdAsync(int chat_id)
+  public async Task<Chat?> GetByIdAsync(int chat_id)
   {
-    throw new NotImplementedException();
+    return await _context.Chats.FirstOrDefaultAsync(c => c.id == chat_id);
   }
 
-  
+ public async Task<Chat> SendMessage(Message message)
+{
+    var chat = await _context.Chats.FirstOrDefaultAsync(c => c.id == message.chatId);
+    
+    if (chat == null)
+    {
+        throw new Exception($"Chat with ID {message.chatId} not found.");
+    }
+
+    if (chat.messages == null)
+    {
+        chat.messages = new List<string>();
+    }
+
+    chat.messages.Add(message.message);
+    await _context.SaveChangesAsync();
+
+    return chat;
+}
+
 }

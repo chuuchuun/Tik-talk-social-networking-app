@@ -1,0 +1,23 @@
+.avatar{
+    height: 32px;
+    width: 32px;
+    border-radius: 50%;
+}
+
+.chat-wrapper{
+    border-bottom: 1px solid var(--light-color);
+    border-left: 1px solid var(--light-color);
+    padding: 24px 20px;
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    grid-gap: 16px;
+}
+
+.username-wrapper{
+    color: var(--ligth-transparent-color);
+}
+.message-preview{
+    display: grid;
+    grid-template-rows:16px 1fr;
+    grid-gap: 12px;
+}

@@ -51,13 +51,13 @@ namespace tik_talk.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "b5e7c6d6-7d11-4e66-a9a7-eaf1e05b1a07",
+                            Id = "d006953c-b987-40c4-970b-5aeeb0f09d5c",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "1580cbc5-bc42-4fba-b825-5d6e7c3e1d3f",
+                            Id = "4ea15d45-6a31-4b7f-8ec9-f4bdb500a156",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -307,17 +307,13 @@ namespace tik_talk.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("userFirstId")
+                    b.Property<int>("userFirst")
                         .HasColumnType("int");
 
-                    b.Property<int>("userSecondId")
+                    b.Property<int>("userSecond")
                         .HasColumnType("int");
 
                     b.HasKey("id");
-
-                    b.HasIndex("userFirstId");
-
-                    b.HasIndex("userSecondId");
 
                     b.ToTable("Chats");
                 });
@@ -371,32 +367,6 @@ namespace tik_talk.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("tik_talk.Models.Chat", b =>
-                {
-                    b.HasOne("tik_talk.Models.Account", "userFirst")
-                        .WithMany("chatsAsFirstUser")
-                        .HasForeignKey("userFirstId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("tik_talk.Models.Account", "userSecond")
-                        .WithMany("chatsAsSecondUser")
-                        .HasForeignKey("userSecondId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("userFirst");
-
-                    b.Navigation("userSecond");
-                });
-
-            modelBuilder.Entity("tik_talk.Models.Account", b =>
-                {
-                    b.Navigation("chatsAsFirstUser");
-
-                    b.Navigation("chatsAsSecondUser");
                 });
 #pragma warning restore 612, 618
         }
