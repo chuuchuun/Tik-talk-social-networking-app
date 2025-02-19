@@ -56,32 +56,31 @@ public async Task<Chat?> CreateAsync(int user1, int user2)
 
   public async Task<List<Chat>> GetAllAsync()
   {
-    return await _context.Chats.ToListAsync();
+    return await _context.Chats.Include(c=>c.messages).ToListAsync();
   }
 
   public async Task<Chat?> GetByIdAsync(int chat_id)
   {
-    return await _context.Chats.FirstOrDefaultAsync(c => c.id == chat_id);
+    return await _context.Chats.Include(c=> c.messages).FirstOrDefaultAsync(c => c.id == chat_id);
   }
 
- public async Task<Chat> SendMessage(Message message)
+public async Task<Chat> SendMessage(Message message)
 {
-    var chat = await _context.Chats.FirstOrDefaultAsync(c => c.id == message.chatId);
-    
+    var chat = await _context.Chats
+        .Include(c => c.messages)  // Ensure messages are loaded
+        .FirstOrDefaultAsync(c => c.id == message.chatId);
+
     if (chat == null)
     {
         throw new Exception($"Chat with ID {message.chatId} not found.");
     }
 
-    if (chat.messages == null)
-    {
-        chat.messages = new List<string>();
-    }
-
-    chat.messages.Add(message.message);
+    // Explicitly add the message to the Messages table
+    _context.Messages.Add(message);
+    chat.messages.Add(message);
     await _context.SaveChangesAsync();
-
     return chat;
 }
+
 
 }

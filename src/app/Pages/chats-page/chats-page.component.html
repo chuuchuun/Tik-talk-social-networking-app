@@ -4,9 +4,12 @@
     </div>
     <div class="chats-list">
         @for (chat of chats() | async; track chat.id){
-            <app-chat-card-component
+            <a
+            (click)="selectChat(chat)"
+><app-chat-card-component
               [chat]="chat"
               ></app-chat-card-component>
+            </a>
             }
     
     </div>
@@ -18,7 +21,7 @@
     </div>
     <div class="chat-main-area">
         <div class="messages">
-            Messages
+           <app-message-space [chat]="selectedChat"></app-message-space>
         </div>
         <div class="enter-message">
         @if(me()){

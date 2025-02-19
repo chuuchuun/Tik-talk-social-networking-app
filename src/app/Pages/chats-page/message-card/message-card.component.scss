@@ -1,0 +1,30 @@
+.me-wrapper{
+    grid-template-columns: 1fr 32px;
+    text-align: right;
+    position:relative;
+}
+.me{
+    background-color: var(--primary-color);
+    width: max-content;
+    position: absolute;
+    right: 44px;
+    top: 20px;
+}
+.basic-wrapper{
+    grid-template-columns: 32px 1fr;
+    text-align: left;
+}
+.basic{
+    background-color: var(--grey-color);
+
+}
+.message-block{
+    display: grid;
+    grid-gap: 12px;
+}
+
+.message-content{
+    display: grid;
+    grid-template-rows: 16px 1fr;
+    grid-gap: 8px;
+}

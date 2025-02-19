@@ -1,0 +1,6 @@
+@if(chat){
+    @for(message of chat.messages; track message.id){
+       <app-message-card [message]="message">
+    </app-message-card>
+    }
+}

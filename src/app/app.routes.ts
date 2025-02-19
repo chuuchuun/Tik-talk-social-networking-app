@@ -14,7 +14,8 @@ export const routes: Routes = [
         {path: 'profile/:id', component:ProfilePageComponent},
         {path: 'subscribers', component:ProfilePageComponent},
         {path: 'settings', component: SettingsPageComponent},
-        {path: 'chats', component: ChatsPageComponent}
+        {path: 'chats', component: ChatsPageComponent},
+    
     ]
     ,canActivate: [canActivateAuth]
 },

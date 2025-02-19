@@ -1,0 +1,34 @@
+@if(isSentFromMe){
+    <div class = "message-block me-wrapper">
+        <div class="message-content">
+            <div class="message-info small-text">
+                {{formatDate(message.createdAt)}}
+                {{firstName}}
+                {{lastName}}
+            </div>
+            <div class="me"> 
+            {{message.text}}
+            </div>
+        </div>
+        <img class="avatar" [src]="avatarUrl" alt="Avatar">
+    </div>
+}
+@else {
+    <div class = "message-block basic-wrapper">
+        <img class="avatar" [src]="avatarUrl" alt="Avatar">
+        <div class="message-content">
+            <div class="message-info small-text">
+                {{firstName}}
+                {{lastName}}
+                {{formatDate(message.createdAt)}}
+
+            </div> 
+            <div class="basic">
+            {{message.text}}
+            </div>
+        </div>
+        
+      </div>
+}
+
+  

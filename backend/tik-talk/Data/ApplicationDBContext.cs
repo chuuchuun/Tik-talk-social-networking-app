@@ -18,11 +18,16 @@ public class ApplicationDBContext : IdentityDbContext<Auth>
 
     public DbSet<Account> Accounts {get;set;}
     public DbSet<Auth> Auths { get; set; }
-
+    public DbSet<Message> Messages { get; set; }
     public DbSet<Chat> Chats{get;set;}
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+         builder.Entity<Message>()
+        .HasOne(m => m.Chat)
+        .WithMany(c => c.messages)
+        .HasForeignKey(m => m.chatId)
+        .OnDelete(DeleteBehavior.Cascade);
         List<IdentityRole> roles = new List<IdentityRole>{
             new IdentityRole{
                 Name = "Admin",

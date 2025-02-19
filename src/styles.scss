@@ -177,3 +177,14 @@ body{
     height: 84px;
     resize: none;
 }
+.avatar{
+    height: 32px;
+    width: 32px;
+    border-radius: 50%;
+}
+.small-text{
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--ligth-color)
+}

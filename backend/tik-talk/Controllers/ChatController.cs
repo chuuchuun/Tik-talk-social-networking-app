@@ -68,7 +68,6 @@ public async Task<IActionResult> DeleteChat(int id)
     [Authorize]
     [HttpGet("get_my_chats")]
     [EnableCors("AllowFrontend")] 
-
     public async Task<IActionResult> GetMyChats()
     {
         var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
@@ -76,15 +75,32 @@ public async Task<IActionResult> DeleteChat(int id)
         {
             var myAccount = await _accountRepo.GetAccountFromTokenAsync(token);
             var myId = myAccount.Id;
+
             var chats = await _chatRepo.GetAllAsync();
-            var myChats = chats.Where(chat => chat.userFirst== myId || chat.userSecond == myId).ToList();
+
+            // Filter only the chats where the user is involved
+            var myChats = chats.Where(chat => chat.userFirst == myId || chat.userSecond == myId).ToList();
+
+            if (!myChats.Any()) 
+            {
+                return Ok(new List<ChatReadDto>()); // Return an empty list if no chats exist
+            }
+
             List<ChatReadDto> chatDtos = new List<ChatReadDto>();
-            foreach(Chat chat in chats){
-                chatDtos.Add(new ChatReadDto{
+            
+            foreach (Chat chat in myChats)
+            {
+                List<MessageReadDto> msgDtos = new List<MessageReadDto>();
+                foreach(Message msg in chat.messages){
+                    msgDtos.Add(msg.ToMessageDto());
+                }
+                chatDtos.Add(new ChatReadDto
+                {
                     id = chat.id,
                     userFirst = chat.userFirst,
                     userSecond = chat.userSecond,
-                    messages = chat.messages
+                    lastMessage = chat.messages.Count > 0 ? chat.messages.Last().text : "No messages yet" ,// Prevent exception
+                    messages = msgDtos
                 });
             }
             
@@ -98,6 +114,52 @@ public async Task<IActionResult> DeleteChat(int id)
         {
             return StatusCode(500, ex.Message);
         }
-     
     }
+
+
+    [Authorize]
+    [EnableCors("AllowFrontend")] 
+    [HttpGet("{id:int}/messages")]
+    public async Task<IActionResult> GetMessages(int id)
+    {
+        var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+        try
+        {
+            var myAccount = await _accountRepo.GetAccountFromTokenAsync(token);
+            var myId = myAccount.Id;
+
+            var chat = await _chatRepo.GetByIdAsync(id);
+           if(chat!=null){
+            List<Message> messages = chat.messages;
+            List<MessageReadDto> messagesDto = new List<MessageReadDto>();
+            
+            foreach (Message message in messages)
+            {
+                messagesDto.Add(new MessageReadDto
+                {
+                    id = message.id,
+                    userFromId = message.userFromId,
+                    text = message.text,
+                    createdAt = message.createdAt
+                });
+            }
+            
+            return Ok(messagesDto);
+        }
+        else{
+            return BadRequest("Chat not found");
+        }
+           }
+           
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+
+
 }

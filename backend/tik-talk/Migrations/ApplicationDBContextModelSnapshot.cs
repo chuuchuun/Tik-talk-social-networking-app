@@ -51,13 +51,13 @@ namespace tik_talk.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "d006953c-b987-40c4-970b-5aeeb0f09d5c",
+                            Id = "7e5185fe-7574-4420-8794-4e1bef6dabbc",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "4ea15d45-6a31-4b7f-8ec9-f4bdb500a156",
+                            Id = "352af648-ceff-476c-a1a7-7754fdfb7886",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -303,10 +303,6 @@ namespace tik_talk.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
-                    b.Property<string>("messages")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("userFirst")
                         .HasColumnType("int");
 
@@ -316,6 +312,34 @@ namespace tik_talk.Migrations
                     b.HasKey("id");
 
                     b.ToTable("Chats");
+                });
+
+            modelBuilder.Entity("tik_talk.Models.Message", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<int>("chatId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("createdAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("userFromId")
+                        .HasColumnType("int");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("chatId");
+
+                    b.ToTable("Message");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -367,6 +391,20 @@ namespace tik_talk.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("tik_talk.Models.Message", b =>
+                {
+                    b.HasOne("tik_talk.Models.Chat", null)
+                        .WithMany("messages")
+                        .HasForeignKey("chatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("tik_talk.Models.Chat", b =>
+                {
+                    b.Navigation("messages");
                 });
 #pragma warning restore 612, 618
         }

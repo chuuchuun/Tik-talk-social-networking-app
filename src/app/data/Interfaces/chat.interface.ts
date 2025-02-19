@@ -1,6 +1,8 @@
+import { Message } from "./message.interface"
 export interface Chat {
     id: number,
     userFirst: number,
     userSecond: number,
-    messages: string[]
+    lastMessage: string,
+    messages : Message[]
 }

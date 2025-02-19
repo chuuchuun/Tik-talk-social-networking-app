@@ -11,5 +11,5 @@ public class Chat
     public int id {get;set;}
     public int userFirst {get;set;}
     public int userSecond{get;set;} 
-    public List<string> messages{get;set;} = new List<string>();
+    public List<Message> messages{get;set;} = new List<Message>();
 }

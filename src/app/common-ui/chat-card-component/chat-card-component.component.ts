@@ -20,7 +20,7 @@ export class ChatCardComponentComponent {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['chat'] && this.chat) {
-      this.lastMessage = this.chat.messages[this.chat.messages.length - 1];
+      this.lastMessage = this.chat.lastMessage;
       this.chat.userFirst;  // Access userFirst when chat is updated
       if(this.chat.userFirst == this.me()?.id){
         this.anotherUser = this.chat.userSecond;

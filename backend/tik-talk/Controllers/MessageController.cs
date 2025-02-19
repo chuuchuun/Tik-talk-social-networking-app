@@ -30,20 +30,48 @@ public class MessageController : ControllerBase
 [Route("{chat_id:int}")]
 public async Task<IActionResult> SendMessage([FromRoute] int chat_id, [FromBody] string message)
 {
-    var chat = await _chatRepo.GetByIdAsync(chat_id);
-    if (chat == null)
+    var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+    try
     {
-        return NotFound($"Chat with ID {chat_id} not found.");
+        // Debug: Log the token
+        Console.WriteLine($"Extracted Token: {token}");
+
+        var myAccount = await _accountRepo.GetAccountFromTokenAsync(token);
+        if (myAccount == null)
+        {
+            return Unauthorized("Invalid or expired token.");
+        }
+
+        var myId = myAccount.Id;
+
+        var chat = await _chatRepo.GetByIdAsync(chat_id);
+        if (chat == null)
+        {
+            return NotFound($"Chat with ID {chat_id} not found.");
+        }
+
+        var wholeMessage = new Message
+        {
+            chatId = chat_id,
+            userFromId = myId,
+            text = message,
+            createdAt = DateTime.UtcNow
+        };
+
+        await _chatRepo.SendMessage(wholeMessage);
+        return Ok(wholeMessage);
     }
-
-    var wholeMessage = new Message
+    catch (UnauthorizedAccessException)
     {
-        chatId = chat_id,
-        message = message
-    };
-
-    await _chatRepo.SendMessage(wholeMessage);
-    return Ok();
+        return Unauthorized("Unauthorized access.");
+    }
+    catch (Exception ex)
+    {
+        // Log the actual exception message
+        Console.WriteLine($"Error: {ex.Message}");
+        return StatusCode(500, $"Internal server error: {ex.Message}");
+    }
 }
+
 
 }
