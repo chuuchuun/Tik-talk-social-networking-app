@@ -1,9 +1,9 @@
-:host{
+.wrapper{
     background-color: var(--dark-color);
     display: grid;
+    grid-gap: 0px;
     grid-template-columns:380px 1fr;
-    height: 100%;
-
+    height: calc(100dvh - 100px);
 }
 
 .search{
@@ -20,6 +20,8 @@
     border-bottom-left-radius: 2px;
     border-left: 1px solid var(--light-color);
     border-bottom: 1px solid var(--light-color);
+    height: calc(100dvh - 48px);
+
 }
 .chats-list{
     border-bottom-left-radius: 2px;
@@ -40,6 +42,8 @@
     border-bottom-left-radius: 2px;
     border-left: 1px solid var(--light-color);
     border-bottom: 1px solid var(--light-color);
+    height: calc(100dvh - 48px);
+
 }
 .chat-main-area{
     display: grid;
@@ -51,11 +55,11 @@
     border-left: 1px solid var(--light-color);
     border-bottom: 1px solid var(--light-color);
     padding: 16px 20px;
+    width: 100%;
+    height: calc(100dvh - 124px);
+    position: relative;
 }
 
-.enter-message{
-    position: relative;
-    bottom: 32px;
-}
+
 
 

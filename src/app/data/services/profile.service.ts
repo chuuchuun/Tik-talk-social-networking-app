@@ -4,7 +4,8 @@ import { Observable } from 'rxjs/internal/Observable';
 import { Profile } from '../Interfaces/profile.interface';
 import { Pageble } from '../Interfaces/pageble.interface';
 import {Chat} from '../Interfaces/chat.interface';
-import { map, pipe, single, tap } from 'rxjs';
+import { BehaviorSubject, map, pipe, single, tap } from 'rxjs';
+import { Message } from '../Interfaces/message.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,8 @@ export class ProfileService {
   baseApiUrl: string = 'http://localhost:5178/api'
   me = signal<Profile | null>(null)
   filteredProfiles = signal<Profile[]>([])
-  myChats = signal<Chat[]>([])
+  private chatsSubject = new BehaviorSubject<Chat[]>([]);
+  chats$ = this.chatsSubject.asObservable(); 
   getTestAccounts(){
       //return this.http.get<Profile[]>(`${this.baseApiUrl}account/test_accounts`)
       return this.http.get<Pageble<Profile>>(`${this.baseApiUrl}/account`)
@@ -89,13 +91,14 @@ export class ProfileService {
     });
   }
   
-  getMyChats(){
-    return this.http.get<Chat[]>(`${this.baseApiUrl}/chat/get_my_chats`)
-    .pipe(
-      tap(res => this.myChats.set(res))
-    )
+ 
+
+  getMyChats(): Observable<Chat[]> {
+    return this.http.get<Chat[]>(`${this.baseApiUrl}/chat/get_my_chats`).pipe(
+      tap(chats => this.chatsSubject.next(chats)) // Update BehaviorSubject
+    );
   }
-  
+
   filterProfiles(params: Record<string, any>){
     return this.http.get<Pageble<Profile>>(`${this.baseApiUrl}/account`,
       {
@@ -106,5 +109,23 @@ export class ProfileService {
       tap(res => this.filteredProfiles.set(res.items))
     )
   }
+  sendMessage(text: string, chat_id: number) {
+    return this.http.post(
+        `${this.baseApiUrl}/message/${chat_id}?text=${encodeURIComponent(text)}`, 
+        null,  // No request body, text is in query parameters
+        { 
+          headers: { 'Content-Type': 'application/json' },
+          withCredentials: true
+        }
+    ).pipe(
+      tap(() => this.getMyChats().subscribe()) // Refresh chats after sending messag
+    );
+
+}
+
+
+getMessages(chatId: number): Observable<Message[]> {
+  return this.http.get<Message[]>(`${this.baseApiUrl}/chat/${chatId}/messages`);
+}
 
 }

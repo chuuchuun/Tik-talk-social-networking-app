@@ -3,12 +3,14 @@ import { Message } from '../../../data/Interfaces/message.interface';
 import { Profile } from '../../../data/Interfaces/profile.interface';
 import { ProfileService } from '../../../data/services/profile.service';
 import { DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-message-card',
   templateUrl: './message-card.component.html',
   styleUrls: ['./message-card.component.scss'],
-  providers: [DatePipe] // Add DatePipe as a provider to the component
+  providers: [DatePipe],
+  imports: [RouterLink]
 })
 export class MessageCardComponent implements OnChanges {
   @Input() message!: Message;
@@ -18,6 +20,7 @@ export class MessageCardComponent implements OnChanges {
   username: string | null = null;
   firstName: string | null = null;
   lastName: string | null = null;
+  senderId: number | null = null;
   me = this.profileService.me();
   constructor(private datePipe: DatePipe) {}  // Inject DatePipe
 
@@ -25,6 +28,7 @@ export class MessageCardComponent implements OnChanges {
     if (changes['message'] && this.message) {
       this.profileService.getAccount(this.message.userFromId).subscribe(
         res => {
+          this.senderId = res.id;
           this.avatarUrl = res.avatarUrl;
           this.username = res.username;
           this.firstName = res.firstName;
@@ -42,21 +46,18 @@ export class MessageCardComponent implements OnChanges {
     this.isSentFromMe = true;
   }
 
-  // Format date depending on whether it's today or from a previous day
   formatDate(date: Date): string {
-    console.log("Date is" ,date.getFullYear, date.getMonth, date.getDate)
     const today = new Date();
-    console.log("Today is", today.getFullYear, today.getMonth, today.getDate)
-    const formattedDate =  this.datePipe.transform(date, "dd-MM-yyyy")
+    const formattedDate =  this.datePipe.transform(date, "dd.MM.yyyy")
     const formattedTime = this.datePipe.transform(date, 'HH:mm');
-    const formatedToday = this.datePipe.transform(today, "dd-MM-yyyy")
-    // Check if the message date is today
+    const formatedToday = this.datePipe.transform(today, "dd.MM.yyyy")
     if (formattedDate?.includes(formatedToday!)) {
-      // If today, show only time (HH:mm)
       return formattedTime || '';
-    } else {
-      // If not today, show date and time (dd-MM-yyyy HH:mm)
-      return `${this.datePipe.transform(date, 'dd-MM-yyyy')} ${formattedTime}`;
+    }
+    if (formattedDate?.substring(6,10) === formatedToday?.substring(6,10)){
+      return `${this.datePipe.transform(date, 'dd.MM')} ${formattedTime}`    } 
+    else {
+      return `${this.datePipe.transform(date, 'dd.MM.yyyy')} ${formattedTime}`;
     }
   }
 }

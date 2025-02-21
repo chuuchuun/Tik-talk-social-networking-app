@@ -1,30 +1,55 @@
-.me-wrapper{
-    grid-template-columns: 1fr 32px;
+.me-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 32px; /* Avatar on the right */
     text-align: right;
-    position:relative;
+    justify-content: end;
 }
-.me{
-    background-color: var(--primary-color);
-    width: max-content;
-    position: absolute;
-    right: 44px;
-    top: 20px;
-}
-.basic-wrapper{
-    grid-template-columns: 32px 1fr;
-    text-align: left;
-}
-.basic{
-    background-color: var(--grey-color);
 
+.me {
+    background-color: var(--primary-color);
+    margin-left: auto; /* Ensures it aligns right */
+    color: var(--dark-color);
 }
-.message-block{
+
+.basic-wrapper {
+    display: grid;
+    grid-template-columns: 32px 1fr; /* Avatar on the left */
+    text-align: left;
+    justify-content: start;
+}
+
+.basic {
+    background-color: var(--grey-color);
+    color: var(--light-color);
+}
+
+.message-block {
     display: grid;
     grid-gap: 12px;
 }
 
-.message-content{
+.text{
+    width: max-content;
+    padding: 8px 16px;
+    border-radius: 1px;
+    gap: 10px;
+    font-family: 'JetBrains Mono';
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 21px;
+    white-space: pre-wrap;  /* Preserve spaces, wrap text automatically */
+  word-wrap: break-word;  /* Break long words to prevent overflow */
+  overflow-wrap: break-word;  /* Alternative for wider browser support */
+  max-width: 50%;  /* Ensure messages don't stretch too wide */
+}
+.message-content {
     display: grid;
-    grid-template-rows: 16px 1fr;
+    grid-template-rows: auto 1fr;
     grid-gap: 8px;
+}
+
+.avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
 }

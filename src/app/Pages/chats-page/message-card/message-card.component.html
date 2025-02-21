@@ -6,16 +6,22 @@
                 {{firstName}}
                 {{lastName}}
             </div>
-            <div class="me"> 
+            <div class="me text"> 
             {{message.text}}
             </div>
         </div>
-        <img class="avatar" [src]="avatarUrl" alt="Avatar">
+        <a 
+        [routerLink]="['../profile/me']">
+            <img class="avatar" [src]="avatarUrl" alt="Avatar">
+        </a>
     </div>
 }
 @else {
     <div class = "message-block basic-wrapper">
-        <img class="avatar" [src]="avatarUrl" alt="Avatar">
+        <a 
+        [routerLink]="['../profile/',message.userFromId]">
+            <img class="avatar" [src]="avatarUrl" alt="Avatar">
+        </a>
         <div class="message-content">
             <div class="message-info small-text">
                 {{firstName}}
@@ -23,7 +29,7 @@
                 {{formatDate(message.createdAt)}}
 
             </div> 
-            <div class="basic">
+            <div class="basic text">
             {{message.text}}
             </div>
         </div>

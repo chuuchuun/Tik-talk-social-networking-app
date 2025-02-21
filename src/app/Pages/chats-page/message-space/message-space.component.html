@@ -1,6 +1,10 @@
+
 @if(chat){
-    @for(message of chat.messages; track message.id){
-       <app-message-card [message]="message">
-    </app-message-card>
-    }
+    <div class="messages">
+        @for(message of this.messages$ | async; track message.id){
+            <app-message-card [message]="message">
+         </app-message-card>
+         }
+    </div>
+    <app-send-message (messageSent)="refreshChats()" [chat]="chat"></app-send-message>
 }

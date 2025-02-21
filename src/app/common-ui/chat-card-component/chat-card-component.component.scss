@@ -17,3 +17,8 @@
     grid-template-rows:16px 1fr;
     grid-gap: 12px;
 }
+.text{
+    white-space: pre-wrap;  /* Preserve spaces, wrap text automatically */
+    word-wrap: break-word;  /* Break long words to prevent overflow */
+    max-width: 20%;
+}

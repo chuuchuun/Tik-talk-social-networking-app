@@ -28,7 +28,7 @@ public class MessageController : ControllerBase
    [HttpPost]
 [Authorize]
 [Route("{chat_id:int}")]
-public async Task<IActionResult> SendMessage([FromRoute] int chat_id, [FromBody] string message)
+public async Task<IActionResult> SendMessage([FromRoute] int chat_id, [FromQuery] string text)
 {
     var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
     try
@@ -54,7 +54,7 @@ public async Task<IActionResult> SendMessage([FromRoute] int chat_id, [FromBody]
         {
             chatId = chat_id,
             userFromId = myId,
-            text = message,
+            text = text,
             createdAt = DateTime.UtcNow
         };
 

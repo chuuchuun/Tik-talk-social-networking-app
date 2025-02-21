@@ -1,29 +1,33 @@
 import { Component, inject, signal } from '@angular/core';
 import { ProfileService } from '../../data/services/profile.service';
-import { ChatCardComponentComponent } from "../../common-ui/chat-card-component/chat-card-component.component";
-import { PostEnterComponent } from "../../common-ui/post-enter/post-enter.component";
-import { AsyncPipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
-import { MessageSpaceComponent } from "./message-space/message-space.component";
 import { Chat } from '../../data/Interfaces/chat.interface';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { MessageSpaceComponent } from "./message-space/message-space.component";
+import { ChatCardComponentComponent } from "../../common-ui/chat-card-component/chat-card-component.component";
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-chats-page',
-  imports: [RouterLink, ChatCardComponentComponent, PostEnterComponent, AsyncPipe, MessageSpaceComponent],
   templateUrl: './chats-page.component.html',
-  styleUrl: './chats-page.component.scss'
+  styleUrl: './chats-page.component.scss',
+  imports: [MessageSpaceComponent, ChatCardComponentComponent, AsyncPipe],
 })
 export class ChatsPageComponent {
-  selectedChat:Chat | null = null 
-  profileService = inject(ProfileService)
-  me = this.profileService.me
-  chats = signal(this.profileService.getMyChats())
-  ngOnInit(){
-    this.profileService.getMyChats()
-    console.log(this.chats())
+  selectedChat: Chat | null = null;
+  profileService = inject(ProfileService);
+  me = this.profileService.me;
+  chats = toSignal(this.profileService.chats$); // Auto-updates on change
+
+  ngOnInit() {
+    this.profileService.getMyChats().subscribe();
   }
 
-  selectChat(chat: Chat){
-    this.selectedChat = chat
+  refreshChatsParent() {
+    console.log("Got notified");
+    this.profileService.getMyChats().subscribe();
+  }
+
+  selectChat(chat: Chat) {
+    this.selectedChat = chat;
   }
 }

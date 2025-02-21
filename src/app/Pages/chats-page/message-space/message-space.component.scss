@@ -1,4 +1,22 @@
 :host{
     display: grid;
+    grid-template-rows: 1fr 76px;
+    grid-gap: 12px;
+    overflow-x: hidden;
+    overflow-y: auto; /* Hide scrollbars */
+    height: 652px;
+    width: min-content;
+}
+
+:host::-webkit-scrollbar{
+    display: none;
+}
+.messages{
+    gap: 32px;
+    display: grid;
     grid-gap: 12px;
 }
+
+
+
+
