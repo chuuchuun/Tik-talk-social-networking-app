@@ -1,19 +1,22 @@
-import { Component, Input, OnChanges, SimpleChanges, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
 import { Message } from '../../../data/Interfaces/message.interface';
 import { Profile } from '../../../data/Interfaces/profile.interface';
 import { ProfileService } from '../../../data/services/profile.service';
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgStyle } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { delay } from 'rxjs';
 
 @Component({
   selector: 'app-message-card',
   templateUrl: './message-card.component.html',
   styleUrls: ['./message-card.component.scss'],
   providers: [DatePipe],
-  imports: [RouterLink]
+  imports: [RouterLink, NgStyle]
 })
 export class MessageCardComponent implements OnChanges {
   @Input() message!: Message;
+  @Input() chatId!: number;
+  @Output() hasModified = new EventEmitter<void>();
   isSentFromMe: boolean = false;
   profileService = inject(ProfileService);
   avatarUrl: string | null = null;
@@ -22,7 +25,51 @@ export class MessageCardComponent implements OnChanges {
   lastName: string | null = null;
   senderId: number | null = null;
   me = this.profileService.me();
-  constructor(private datePipe: DatePipe) {}  // Inject DatePipe
+  contextMenuVisible = false;
+  contextMenuX = 0;
+  contextMenuY = 0;
+
+  openContextMenu(event: MouseEvent, message: Message) {
+    console.log("Clicked")
+    event.preventDefault(); // Prevent default right-click menu
+    this.contextMenuVisible = true;
+    this.contextMenuX = event.clientX;
+    this.contextMenuY = event.clientY;
+  }
+  deleteMessage(messageId: number) {
+    console.log("Delete message:", messageId);
+    this.contextMenuVisible = false;
+  
+    this.profileService.deleteMessage(this.chatId, messageId)
+      .pipe(delay(500)) // Delay refresh by 500ms to avoid premature UI update
+      .subscribe({
+        next: () => {
+          console.log("Message deleted successfully");
+          this.hasModified.emit();
+        },
+        error: err => {
+          console.error("Error deleting message:", err);
+        }
+      });
+  }
+  
+
+  editMessage(message: Message) {
+    console.log("Edit message:", message);
+    this.contextMenuVisible = false;
+    // Implement edit functionality (e.g., open a modal)
+  }
+
+  pinMessage(messageId: number) {
+    console.log("Pin message:", messageId);
+    this.contextMenuVisible = false;
+    // Implement pin functionality
+  }
+  constructor(private datePipe: DatePipe) {
+      document.addEventListener('click', () => {
+        this.contextMenuVisible = false;
+      });
+  }  // Inject DatePipe
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['message'] && this.message) {

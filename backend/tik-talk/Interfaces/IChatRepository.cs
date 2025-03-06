@@ -14,4 +14,5 @@ public interface IChatRepository
     Task<Chat?> GetByIdAsync(int chat_id);
     Task<Chat?> DeleteAsync(int id);
     Task<Chat> SendMessage(Message message);
+    Task<Chat> DeleteMessageByIdAsync(int message_id);
 }

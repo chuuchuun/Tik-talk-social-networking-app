@@ -15,7 +15,7 @@
         
     </header>
     <main class="profile-page-main">
-        <app-post-feed [profile]="profile">
+        <app-post-feed [profile]="profile" (postCreatedParent)="refreshPostsOnPage()">
         </app-post-feed>
 
         <div>

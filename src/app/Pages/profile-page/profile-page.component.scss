@@ -1,3 +1,4 @@
+
 .profile-page-header{
     padding: 24px;
     display:flex;
@@ -23,6 +24,8 @@
     display:grid;
     grid-template-columns: 1fr 350px;
     grid-gap: 64px;
+    box-sizing: border-box;
+    height:600px;
 }
 
 .subscribers-wrapper{

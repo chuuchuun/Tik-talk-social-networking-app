@@ -38,147 +38,130 @@ public class AccountController : ControllerBase
     }
 
    [HttpGet]
-public async Task<IActionResult> GetAll(
-    [FromQuery] string? username = null,
-    [FromQuery] string? stack = null,
-    [FromQuery] string? firstLastName = null,
-    [FromQuery] string? city = null,
-    [FromQuery] string? orderBy = "id",
-    [FromQuery] int page = 1,
-    [FromQuery] int size = 50)
-{
-    // Validate page and size parameters
-    if (page <= 0 || size <= 0)
-        return BadRequest(new { message = "Page and size must be greater than zero." });
+    public async Task<IActionResult> GetAll(
+        [FromQuery] string? username = null,
+        [FromQuery] string? stack = null,
+        [FromQuery] string? firstLastName = null,
+        [FromQuery] string? city = null,
+        [FromQuery] string? orderBy = "id",
+        [FromQuery] int page = 1,
+        [FromQuery] int size = 50)
+    {
+        if (page <= 0 || size <= 0) return BadRequest(new { message = "Page and size must be greater than zero." });
 
-    // Fetch all accounts
-    var accounts = await _accountRepo.GetAllAsync();
-    if(!string.IsNullOrEmpty(username)){
-        var usernameFilter = username.ToLower();
+        var accounts = await _accountRepo.GetAllAsync();
+        if(!string.IsNullOrEmpty(username)){
+            var usernameFilter = username.ToLower();
+                accounts = accounts
+                    .Where(account =>
+                        (!string.IsNullOrEmpty(account.username)) &&
+                        account.username.ToLower().Contains(usernameFilter)                
+                    )
+                .ToList();
+        }
+        if (!string.IsNullOrEmpty(stack))
+        {
+            accounts = accounts
+                .Where(account => account.stack.Contains(stack))
+                .ToList();
+        }
+
+        if (!string.IsNullOrEmpty(firstLastName))
+        {
+            var nameFilter = firstLastName.ToLower();
             accounts = accounts
                 .Where(account =>
-                    (!string.IsNullOrEmpty(account.username)) &&
-                    account.username.ToLower().Contains(usernameFilter)                
-                )
+                    !string.IsNullOrEmpty(account.firstName) && !string.IsNullOrEmpty(account.lastName) &&
+                    (
+                        (account.firstName + " " + account.lastName).ToLower().Contains(nameFilter) ||
+                        (account.lastName + " " + account.firstName).ToLower().Contains(nameFilter)
+                    ))
+                .ToList();
+        }
+
+        if (!string.IsNullOrEmpty(city))
+        {
+            accounts = accounts
+                .Where(account => !string.IsNullOrEmpty(account.city) && account.city.Equals(city, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+        var accountDTO = accounts
+            .Select(account => account.ToAccountDto())
             .ToList();
-    }
-    // Apply filters
-    if (!string.IsNullOrEmpty(stack))
-    {
-        accounts = accounts
-            .Where(account => account.stack.Contains(stack))
+
+        accountDTO = orderBy.ToLower() switch
+        {
+            "username" => accountDTO.OrderBy(dto => dto.Username).ToList(),
+            "subscribersamount" => accountDTO.OrderByDescending(dto => dto.SubscribersAmount).ToList(),
+            "city" => accountDTO.OrderBy(dto => dto.City).ToList(),
+            _ => accountDTO.OrderBy(dto => dto.Id).ToList(),
+        };
+
+        var total = accountDTO.Count;
+        var totalPages = (int)Math.Ceiling((double)total / size);
+
+        var paginatedAccounts = accountDTO
+            .Skip((page - 1) * size)
+            .Take(size)
             .ToList();
+
+        var response = new
+        {
+            Items = paginatedAccounts,
+            Total = total,
+            Page = page,
+            Size = size,
+            Pages = totalPages
+        };
+
+        return Ok(response);
     }
-
-    if (!string.IsNullOrEmpty(firstLastName))
-    {
-        var nameFilter = firstLastName.ToLower();
-        accounts = accounts
-            .Where(account =>
-                !string.IsNullOrEmpty(account.firstName) && !string.IsNullOrEmpty(account.lastName) &&
-                (
-                    (account.firstName + " " + account.lastName).ToLower().Contains(nameFilter) ||
-                    (account.lastName + " " + account.firstName).ToLower().Contains(nameFilter)
-                ))
-            .ToList();
-    }
-
-    if (!string.IsNullOrEmpty(city))
-    {
-        accounts = accounts
-            .Where(account => !string.IsNullOrEmpty(account.city) && account.city.Equals(city, StringComparison.OrdinalIgnoreCase))
-            .ToList();
-    }
-
-    // Map to DTOs
-    var accountDTO = accounts
-        .Select(account => account.ToAccountDto())
-        .ToList();
-
-    // Apply sorting
-    accountDTO = orderBy.ToLower() switch
-    {
-        "username" => accountDTO.OrderBy(dto => dto.Username).ToList(),
-        "subscribersamount" => accountDTO.OrderByDescending(dto => dto.SubscribersAmount).ToList(),
-        "city" => accountDTO.OrderBy(dto => dto.City).ToList(),
-        _ => accountDTO.OrderBy(dto => dto.Id).ToList(),
-    };
-
-    // Get total and apply pagination
-    var total = accountDTO.Count;
-    var totalPages = (int)Math.Ceiling((double)total / size);
-
-    var paginatedAccounts = accountDTO
-        .Skip((page - 1) * size)
-        .Take(size)
-        .ToList();
-
-    // Prepare response
-    var response = new
-    {
-        Items = paginatedAccounts,
-        Total = total,
-        Page = page,
-        Size = size,
-        Pages = totalPages
-    };
-
-    return Ok(response);
-}
 
 
 
     [HttpPost]
-        public async Task<IActionResult> Create([FromBody] AccountDto account){
-            if(!ModelState.IsValid){
-                return BadRequest(ModelState);
-            }
-            //var stockModel = stockDto.ToStockFromCreateRequestDto();
-            await _accountRepo.CreateAsync(account.ToAccount());
-            return Ok(account);
-        }
-    [HttpPatch]
-[Route("me")]
-public async Task<IActionResult> Update([FromBody] UpdateAccount accountDTO)
-{
-    try
-    {
-        Console.WriteLine("Request received with token: " + Request.Headers["Authorization"]);
-
-        var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
-        var currentAccount = await _accountRepo.GetAccountFromTokenAsync(token);
-
-        if (currentAccount == null)
-        {
-            Console.WriteLine("No account found for the token.");
-            return NotFound("Current account not found.");
-        }
-
-        if (!ModelState.IsValid)
-        {
-            Console.WriteLine("Invalid model state: " + string.Join(", ", ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage))));
+    public async Task<IActionResult> Create([FromBody] AccountDto account){
+        if(!ModelState.IsValid){
             return BadRequest(ModelState);
         }
-
-        var account = await _accountRepo.UpdateAsync(currentAccount.Id, accountDTO);
-        if (account == null)
-        {
-            Console.WriteLine("Account update failed.");
-            return NotFound();
-        }
-
-        Console.WriteLine("Account updated successfully.");
+        await _accountRepo.CreateAsync(account.ToAccount());
         return Ok(account);
     }
-    catch (Exception ex)
+
+    [HttpPatch]
+    [Route("me")]
+    public async Task<IActionResult> Update([FromBody] UpdateAccount accountDTO)
     {
-        Console.WriteLine("Error: " + ex.Message);
-        return StatusCode(500, "Internal server error.");
+        try
+        {
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+            var currentAccount = await _accountRepo.GetAccountFromTokenAsync(token);
+
+            if (currentAccount == null)
+            {
+                return NotFound("Current account not found.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var account = await _accountRepo.UpdateAsync(currentAccount.Id, accountDTO);
+            if (account == null)
+            {
+                return NotFound();
+            }
+            return Ok(account);
+        }
+        catch 
+        {
+            return StatusCode(500, "Internal server error.");
+        }
     }
-}
 
 
-      [HttpGet]
+    [HttpGet]
     [Route("{id:int}")]
     public async Task<IActionResult> GeAccountById([FromRoute] int id){
         if(!ModelState.IsValid){

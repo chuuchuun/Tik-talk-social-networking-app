@@ -72,6 +72,38 @@ public async Task<IActionResult> SendMessage([FromRoute] int chat_id, [FromQuery
         return StatusCode(500, $"Internal server error: {ex.Message}");
     }
 }
+ [HttpDelete]
+[Authorize]
+[Route("{chat_id:int}/{message_id:int}")]
+public async Task<IActionResult> DeleteMessage([FromRoute] int chat_id, [FromRoute] int message_id)
+{
+    var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
+    try
+    {
+        var myAccount = await _accountRepo.GetAccountFromTokenAsync(token);
+        if (myAccount == null)
+        {
+            return Unauthorized("Invalid or expired token.");
+        }
+
+        var myId = myAccount.Id;
+
+        var chat = await _chatRepo.DeleteMessageByIdAsync(message_id);
+        return Ok(chat);
+    }
+    catch (UnauthorizedAccessException)
+    {
+        return Unauthorized("Unauthorized access.");
+    }
+    catch (Exception ex)
+    {
+        // Log the actual exception message
+        Console.WriteLine($"Error: {ex.Message}");
+        return StatusCode(500, $"Internal server error: {ex.Message}");
+    }
+}
+
+
 
 
 }

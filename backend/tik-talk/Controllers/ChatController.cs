@@ -68,7 +68,9 @@ public async Task<IActionResult> DeleteChat(int id)
     [Authorize]
     [HttpGet("get_my_chats")]
     [EnableCors("AllowFrontend")] 
-    public async Task<IActionResult> GetMyChats()
+    public async Task<IActionResult> GetMyChats(
+        [FromQuery] string? username = null
+    )
     {
         var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "").Trim();
         try
@@ -81,6 +83,15 @@ public async Task<IActionResult> DeleteChat(int id)
             // Filter only the chats where the user is involved
             var myChats = chats.Where(chat => chat.userFirst == myId || chat.userSecond == myId).ToList();
 
+            if(!string.IsNullOrEmpty(username))
+            {
+                var user = await _accountRepo.GetByUsernameAsync(username.ToLower());
+                if(user == null){
+                    return BadRequest("User not found");
+                }
+                var userId = user.Id;
+                myChats = myChats.Where(c => c.userFirst == userId || c.userSecond == userId).ToList();
+            }
             if (!myChats.Any()) 
             {
                 return Ok(new List<ChatReadDto>()); // Return an empty list if no chats exist

@@ -1,0 +1,11 @@
+
+
+.wrapper{
+    background-color: var(--dark-color);
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    height: min-content;
+    grid-gap: 16px;
+    border: 1px solid var(--light-color);
+}

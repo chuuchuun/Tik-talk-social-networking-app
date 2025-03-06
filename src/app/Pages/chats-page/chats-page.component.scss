@@ -1,12 +1,11 @@
-.wrapper{
+:host{
     background-color: var(--dark-color);
     display: grid;
-    grid-gap: 0px;
     grid-template-columns:380px 1fr;
-    height: calc(100dvh - 100px);
 }
-
-.search{
+.search {
+    width: 100%;
+    box-sizing: border-box; /* Ensures padding/borders don't expand width */
     border-top: 1px solid var(--light-color);
     border-left: 1px solid var(--light-color);
     border-bottom: 1px solid var(--light-color);
@@ -14,35 +13,31 @@
     padding: 16px 20px;
 }
 
-.all-chats-wrapper{
+
+.all-chats-wrapper {
+    width: 380px;
     display: grid;
     grid-template-rows: 76px 1fr;
     border-bottom-left-radius: 2px;
     border-left: 1px solid var(--light-color);
     border-bottom: 1px solid var(--light-color);
     height: calc(100dvh - 48px);
-
+    box-sizing: border-box;
+    overflow: hidden; /* Prevents children from exceeding parent's width */
 }
+
 .chats-list{
+    width: 100%;
     border-bottom-left-radius: 2px;
     border-left: 1px solid var(--light-color);
     border-bottom: 1px solid var(--light-color);
     background-color: var(--dark-color);
 }
 
-.chat-header{
-    border-top-right-radius: 2px;
-    border: 1px solid var(--light-color);
-    padding: 16px 20px;
-}
-
 .specific-chat{
-    display: grid;
-    grid-template-rows: 76px 1fr;
     border-bottom-left-radius: 2px;
-    border-left: 1px solid var(--light-color);
-    border-bottom: 1px solid var(--light-color);
-    height: calc(100dvh - 48px);
+    border: 1px solid var(--light-color);
+    border-top-right-radius: 2px;
 
 }
 .chat-main-area{

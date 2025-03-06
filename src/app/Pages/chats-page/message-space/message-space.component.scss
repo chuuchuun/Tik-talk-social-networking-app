@@ -1,22 +1,65 @@
 :host{
     display: grid;
-    grid-template-rows: 1fr 76px;
-    grid-gap: 12px;
-    overflow-x: hidden;
-    overflow-y: auto; /* Hide scrollbars */
-    height: 652px;
-    width: min-content;
+    grid-template-rows: 76px 1fr;
+    grid-gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-:host::-webkit-scrollbar{
+a{
+    text-decoration: none;
+}
+.messages::-webkit-scrollbar{
     display: none;
 }
 .messages{
-    gap: 32px;
+    display: flex;
+    gap: 12px;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 550px;
+}
+.messages-wrapper{
     display: grid;
-    grid-gap: 12px;
+    grid-template-rows: 1fr 76px;
+    grid-gap: 16px;
+    align-items: flex-end;
+    padding: 16px 20px;
+}
+.chat-header{
+    display: flex;
+    gap: 6px;
+    height: 76px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--light-color);
+    text-align: center;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
 }
 
+.small-btn{
+    border: 1px solid var(--light-color);
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    align-content: center;
+    svg{
+        height: 16px;
+        width: 16px;
+    }
+}
+.header-info{
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    grid-gap: 12px;
+    align-content: center;
+    align-items: center;
+    color: var(--light-color);
+}
 
 
 

@@ -20,6 +20,7 @@ public class ApplicationDBContext : IdentityDbContext<Auth>
     public DbSet<Auth> Auths { get; set; }
     public DbSet<Message> Messages { get; set; }
     public DbSet<Chat> Chats{get;set;}
+    public DbSet<Post> Posts { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

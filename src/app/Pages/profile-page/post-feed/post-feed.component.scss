@@ -1,0 +1,13 @@
+:host{
+    overflow-x: hidden;
+    overflow-y: auto;
+    box-sizing: border-box;
+    display: grid;
+    height: 580px;
+    grid-template-rows: 76px 1fr;
+    grid-gap: 16px;
+}
+
+:host::-webkit-scrollbar{
+    display: none;
+}

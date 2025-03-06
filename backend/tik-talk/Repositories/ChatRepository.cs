@@ -82,5 +82,23 @@ public async Task<Chat> SendMessage(Message message)
     return chat;
 }
 
+public async Task<Chat> DeleteMessageByIdAsync(int message_id){
+    var message = await _context.Messages.FirstOrDefaultAsync(m => m.id == message_id);
+    if(message == null){
+              throw new Exception($"Message with ID {message_id} not found.");
 
+    }
+    var chat = await _context.Chats
+        .Include(c => c.messages).FirstOrDefaultAsync(c => c.id == message.chatId);// Ensure messages are loaded
+
+    if (chat == null)
+    {
+        throw new Exception($"Chat with ID {message.chatId} not found.");
+    }
+
+    _context.Messages.Remove(message);
+    chat.messages.Remove(message);
+    await _context.SaveChangesAsync();
+    return chat;
+}
 }

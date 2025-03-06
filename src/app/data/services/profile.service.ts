@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Observable } from 'rxjs/internal/Observable';
 import { Profile } from '../Interfaces/profile.interface';
@@ -6,6 +6,7 @@ import { Pageble } from '../Interfaces/pageble.interface';
 import {Chat} from '../Interfaces/chat.interface';
 import { BehaviorSubject, map, pipe, single, tap } from 'rxjs';
 import { Message } from '../Interfaces/message.interface';
+import { Post } from '../Interfaces/post.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +19,6 @@ export class ProfileService {
   private chatsSubject = new BehaviorSubject<Chat[]>([]);
   chats$ = this.chatsSubject.asObservable(); 
   getTestAccounts(){
-      //return this.http.get<Profile[]>(`${this.baseApiUrl}account/test_accounts`)
       return this.http.get<Pageble<Profile>>(`${this.baseApiUrl}/account`)
         .pipe(
           map(res => res.items)
@@ -75,13 +75,11 @@ export class ProfileService {
   }
 
   uploadImage(file: File) {
-    console.log('File:', file);  // Log the file object to see if it is being passed correctly
+    console.log('File:', file);
     const fd = new FormData();
-    
-    // Check if file is valid
-    if (file) {
+        if (file) {
       fd.append('file', file);
-      console.log('FormData:', fd.get('file')); // Log the FormData to verify the file is appended
+      console.log('FormData:', fd.get('file'));
     } else {
       console.log('No file provided');
     }
@@ -95,7 +93,17 @@ export class ProfileService {
 
   getMyChats(): Observable<Chat[]> {
     return this.http.get<Chat[]>(`${this.baseApiUrl}/chat/get_my_chats`).pipe(
-      tap(chats => this.chatsSubject.next(chats)) // Update BehaviorSubject
+      tap(chats => this.chatsSubject.next(chats))
+    );
+  }
+
+  filterChats(params: Record<string, any>){
+    return this.http.get<Chat[]>(`${this.baseApiUrl}/chat/get_my_chats`,
+      {
+        params
+      }
+    ).pipe(
+      tap(chats => this.chatsSubject.next(chats))
     );
   }
 
@@ -112,20 +120,37 @@ export class ProfileService {
   sendMessage(text: string, chat_id: number) {
     return this.http.post(
         `${this.baseApiUrl}/message/${chat_id}?text=${encodeURIComponent(text)}`, 
-        null,  // No request body, text is in query parameters
+        null,
         { 
           headers: { 'Content-Type': 'application/json' },
           withCredentials: true
         }
     ).pipe(
-      tap(() => this.getMyChats().subscribe()) // Refresh chats after sending messag
+      tap(() => this.getMyChats().subscribe())
     );
+  }
 
-}
+  getMessages(chatId: number): Observable<Message[]> {
+    return this.http.get<Message[]>(`${this.baseApiUrl}/chat/${chatId}/messages`);
+  }
 
+  deleteMessage(chat_id: number, message_id: number): Observable<any> {
+    return this.http.delete<Observable<any>>(`${this.baseApiUrl}/message/${chat_id}/${message_id}`)
+  }
 
-getMessages(chatId: number): Observable<Message[]> {
-  return this.http.get<Message[]>(`${this.baseApiUrl}/chat/${chatId}/messages`);
-}
-
+  getPosts(profile_id: number): Observable<Post[]> {
+    return this.http.get<Post[]>(`${this.baseApiUrl}/post`, {
+      params: new HttpParams().set('user_id', profile_id)
+    });
+  }
+  
+  createPost(title: string, content: string): Observable<Post> {
+    const userId = this.me()?.id; 
+    return this.http.post<Post>(`${this.baseApiUrl}/post`, {
+      title,
+      content,
+      authorId: userId
+    });
+  }
+  
 }

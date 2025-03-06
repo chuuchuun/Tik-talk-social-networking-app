@@ -22,9 +22,11 @@ export class ProfilePageComponent {
   profile$ = this.route.params
   .pipe(
     switchMap(({id}) => {
-      if(id == 'me') return this.me$
-      return this.profileService.getAccount(id)
-      })
+      if (id === 'me') {
+        return this.me$; // Use the `me$` observable when the ID is 'me'
+      }
+      return this.profileService.getAccount(id); // Otherwise, fetch the profile by ID
+    })
   )
   subscribers$ = this.profile$.pipe(
     switchMap((profile) =>
@@ -36,4 +38,12 @@ export class ProfilePageComponent {
       this.profileService.getSubscribersAmount(profile!.id)
     )
   );
+  refreshPostsOnPage() {
+    console.log("Got notified");
+    this.profile$.subscribe(profile => {
+      if (profile) {
+        this.profileService.getPosts(profile.id).subscribe();
+      }
+    });
+  }
 }
