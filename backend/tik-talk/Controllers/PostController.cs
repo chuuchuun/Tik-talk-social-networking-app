@@ -35,18 +35,23 @@ public class PostController : ControllerBase
         await _postRepo.CreateAsync(post);
         return Ok(post);
     }
-
+    
     [HttpGet]
-    public async Task<IActionResult> GetPostsByUserId([FromQuery] int user_id){
-        if(!ModelState.IsValid){
+    public async Task<IActionResult> GetPostsByUserId([FromQuery] int user_id)
+    {
+        if (!ModelState.IsValid)
+        {
             return BadRequest(ModelState);
         }
         var posts = await _postRepo.GetByUserIdAsync(user_id);
-        if(posts == null){
+        if (posts == null)
+        {
             return NotFound();
         }
-        return Ok(posts);
+        var orderedPosts = posts.OrderByDescending(post => post.id).ToList();
+        return Ok(orderedPosts);
     }
+
 
     [HttpGet("{post_id}")]
     public async Task<IActionResult> GetPost([FromRoute] int post_id){
