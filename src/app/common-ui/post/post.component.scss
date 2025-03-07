@@ -1,5 +1,3 @@
-
-
 .wrapper{
     background-color: var(--dark-color);
     padding: 20px;
@@ -8,4 +6,31 @@
     height: min-content;
     grid-gap: 16px;
     border: 1px solid var(--light-color);
+}
+
+.post-area{
+    display: grid;
+    grid-template-columns: 1fr 44px;
+    grid-gap: 8px;
+}
+
+.text{
+    white-space: pre-wrap;  /* Preserve spaces, wrap text automatically */
+    word-wrap: break-word;  /* Break long words to prevent overflow */
+    max-width: 75%;
+}
+.header{
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+}
+
+.post-content{
+    box-sizing: border-box;
+    overflow: hidden;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }

@@ -147,10 +147,12 @@ export class ProfileService {
   createPost(title: string, content: string): Observable<Post> {
     const userId = this.me()?.id; 
     return this.http.post<Post>(`${this.baseApiUrl}/post`, {
-      title,
       content,
       authorId: userId
     });
   }
   
+  deletePost(post_id : number){
+    return this.http.delete<Observable<any>>(`${this.baseApiUrl}/post/${post_id}`)
+  }
 }

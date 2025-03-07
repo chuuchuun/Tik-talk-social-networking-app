@@ -21,8 +21,16 @@ public class PostRepository : IPostRepository
     }
   public async Task<Post?> CreateAsync(PostCreateDto post)
   {
+    var indexOfWhitespace = post.content.IndexOf(" ");
+    string? possibleTitle;
+    if (indexOfWhitespace == -1){
+      possibleTitle = post.content;
+    }
+    else{
+      possibleTitle = post.content.Substring(0, indexOfWhitespace);
+    }
     var postModel = new Post{
-        title = post.title,
+        title = possibleTitle,
         content = post.content,
         authorId = post.authorId,
         communityId = 0,

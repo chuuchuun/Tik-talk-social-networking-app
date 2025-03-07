@@ -2,6 +2,6 @@
 </app-post-enter>
 
 @for (post of posts$ | async; track post.id) {
-    <app-post [post]="post" [author]="profile">
+    <app-post [post]="post" [author]="profile" (modified)="refreshPosts()" >
     </app-post>
 }

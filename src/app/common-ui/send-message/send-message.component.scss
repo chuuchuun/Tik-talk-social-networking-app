@@ -24,17 +24,8 @@
     align-self: center;
     text-align: center;
 }
-.send-message-area{
-    width: 100%;
-    border: none;
-    resize: none;
-    overflow-x: hidden;
-    overflow-y: auto;
-}
 
-.send-message-area::-webkit-scrollbar{
-    display: none;
-}
+
 .profile-card-avatar{
     width: 32px;
     height: 32px;
@@ -48,12 +39,4 @@
     align-self: center;
     text-align: center;
 }
-.small{
-    padding: 14px;
-    width: 44px;
-    align-content: center;
-    align-items: center;
-    align-self: center;
-    text-align: center;
-    height: 44px;
-}
+

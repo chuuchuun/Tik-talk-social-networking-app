@@ -1,8 +1,10 @@
 :host{
     height: 76px;
-   box-sizing: border-box;
+    box-sizing: border-box;
 }
 .profile-card{
+    align-items: center;
+    align-content: center;
     height: 76px;
     border: 1px solid var(--light-color);
     padding: 32px 24px;
@@ -13,10 +15,14 @@
     background-color: var(--dark-color);
 }
 .enter-post-form{
-display: grid;
-grid-template-columns: 1fr 1fr 44px 40px;
-grid-gap: 3px; 
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 1fr 44px 40px;
+    grid-gap: 12px; 
+    align-items: center;
+    align-content: center;
 }
+
 .avatar-name{
     display: grid;
     grid-template-columns: 70px 1fr;
